@@ -12,17 +12,153 @@ the failure modes you will hit, and how to set up a workflow that survives them.
 
 ## Table of Contents
 
-1. [The right mental model](#the-right-mental-model)
-2. [CLAUDE.md: the most important file](#claudemd-the-most-important-file)
-3. [Skills: reusable procedures](#skills-reusable-procedures)
-4. [The dual-document pattern: main.tex and condensed.tex](#the-dual-document-pattern-maintex-and-condensedtex)
-5. [Session continuity: next-session-prompts.md](#session-continuity-next-session-promptsmd)
-6. [Settings and hooks](#settings-and-hooks)
-7. [Git workflow for academics](#git-workflow-for-academics)
-8. [GitHub README and LaTeX](#github-readme-and-latex)
-9. [Numerics and computation](#numerics-and-computation)
-10. [Honest limitations](#honest-limitations)
-11. [Templates and scripts in this repo](#templates-and-scripts-in-this-repo)
+0. [Installation and first launch](#installation-and-first-launch)
+1. [Quick-start flowcharts](#quick-start-flowcharts)
+2. [The right mental model](#the-right-mental-model)
+3. [CLAUDE.md: the most important file](#claudemd-the-most-important-file)
+4. [Skills: reusable procedures](#skills-reusable-procedures)
+5. [The dual-document pattern: main.tex and condensed.tex](#the-dual-document-pattern-maintex-and-condensedtex)
+6. [Session continuity: next-session-prompts.md](#session-continuity-next-session-promptsmd)
+7. [Settings and hooks](#settings-and-hooks)
+8. [Git workflow for academics](#git-workflow-for-academics)
+9. [GitHub README and LaTeX](#github-readme-and-latex)
+10. [Numerics and computation](#numerics-and-computation)
+11. [Honest limitations](#honest-limitations)
+12. [Templates and scripts in this repo](#templates-and-scripts-in-this-repo)
+
+---
+
+## Installation and first launch
+
+This section is for readers who have never used VS Code or Claude Code before.
+If you are already set up, skip to [Quick-start flowcharts](#quick-start-flowcharts).
+
+### What you need
+
+- A computer running macOS, Windows, or Linux
+- An [Anthropic account](https://console.anthropic.com/) (the same account you use for Claude on the web)
+- A Claude Pro subscription **or** API credits — Claude Code uses your API account
+
+You do not need to know anything about terminal commands or configuration files
+to get started. This guide walks through each step.
+
+---
+
+### Step 1 — Install VS Code
+
+VS Code is a free text editor made by Microsoft. Claude Code runs inside it as
+an extension. You can also run Claude Code in a standalone terminal, but VS Code
+gives you a much better experience: you see the files Claude is editing, the
+terminal where it runs, and the chat window all in one place.
+
+1. Go to [https://code.visualstudio.com](https://code.visualstudio.com) and
+   click the download button for your operating system.
+2. Run the installer. On macOS, drag VS Code into your Applications folder.
+   On Windows, the installer does everything for you.
+3. Open VS Code. You will see a welcome screen. You can close it.
+
+That is all. You do not need to configure anything in VS Code before continuing.
+
+---
+
+### Step 2 — Install the Claude Code extension
+
+1. In VS Code, click the **Extensions** icon on the left sidebar (it looks like
+   four squares, one slightly detached).
+2. In the search box that appears, type `Claude Code`.
+3. The first result should be "Claude Code" by Anthropic. Click **Install**.
+4. After installation, a Claude icon appears in the left sidebar.
+
+Alternatively, you can install Claude Code as a command-line tool and use it
+from any terminal without VS Code:
+
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+This requires Node.js to be installed. The VS Code extension is easier if you
+are not familiar with the terminal.
+
+---
+
+### Step 3 — Sign in
+
+1. Click the Claude icon in the VS Code sidebar.
+2. Click **Sign in with Anthropic**.
+3. A browser window will open. Sign in with your Anthropic account.
+4. After signing in, return to VS Code. You should see a chat interface.
+
+If you are using API credits instead of Claude Pro: in the sign-in screen,
+choose **Use API key**, paste your key from
+[console.anthropic.com/settings/api-keys](https://console.anthropic.com/settings/api-keys),
+and confirm.
+
+---
+
+### Step 4 — Open your project folder
+
+Claude Code works on a folder, not a single file. It reads the files in your
+project folder and makes changes to them.
+
+1. In VS Code, go to **File → Open Folder** (macOS: **File → Open...**).
+2. Navigate to your research project directory and open it.
+3. VS Code will show your files in the left sidebar under "Explorer."
+
+If you do not have a project folder yet, create one:
+
+```bash
+mkdir my-research-project
+cd my-research-project
+git init
+```
+
+The `git init` command sets up version control, which Claude Code uses to track
+changes and help you undo mistakes. If you do not have git installed, see
+[git-scm.com/downloads](https://git-scm.com/downloads).
+
+---
+
+### Step 5 — Start a conversation
+
+In the Claude Code chat panel (the one that opened when you clicked the Claude
+icon), type a message and press Enter. For example:
+
+> "I just opened my project folder. What files are in it?"
+
+Claude will look at your folder and reply. From here, you can ask it to read
+files, write code, compile LaTeX, run Python scripts, or help you organise your
+work.
+
+**The most important thing to do next** is create a `CLAUDE.md` file in your
+project folder. This file tells Claude everything it needs to know about your
+project every time you open it. Without it, Claude starts each session knowing
+nothing about your work. The [CLAUDE.md section](#claudemd-the-most-important-file)
+below explains exactly what to put in it.
+
+---
+
+### A note on cost
+
+Claude Code charges per message based on the length of the conversation. A
+typical research session (a few hours of active use) costs roughly $1–5 USD in
+API tokens, depending on how much context is loaded and how many files are read.
+
+You can track your usage at
+[console.anthropic.com/usage](https://console.anthropic.com/usage). If you have
+a Claude Pro subscription, Claude Code usage is included in that plan.
+
+---
+
+## Quick-start flowcharts
+
+Animated overviews of the two key workflows. Each step appears in sequence so
+you can follow the logic before reading the full guide.
+
+| Setting up a new project | Each working session |
+|:---:|:---:|
+| ![Project setup flowchart](assets/flowchart-setup.png) | ![Session workflow flowchart](assets/flowchart-session.png) |
+
+Green = start/end · Blue = action · Gold = decision · Red label = no path · Green label = yes path
 
 ---
 

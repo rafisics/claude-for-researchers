@@ -76,3 +76,7 @@ Use it only to check that the guide's advice matches what actually worked.
 - Anything from the source physics project (content, formulas, results)
 - Personal email addresses or account names (use placeholders like YOUR_GITHUB_USER)
 - Any claim that Claude is a research collaborator or co-author (it is a tool)
+
+## ⚠️ Auto-saved before context compact [2026-06-05 20:54]
+Session was compacted. Last known state is in the "Current status" section above.
+To resume: start new session, open next-session-prompts.md, paste the top prompt.
