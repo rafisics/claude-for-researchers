@@ -1,0 +1,54 @@
+# sync-condensed
+
+Propagate load-bearing changes from the main document to the condensed reference.
+
+## When to invoke
+After establishing a new result, correcting a formula, or completing a section
+in the main document. NOT for every edit — only for changes that affect what
+is established.
+
+## What "load-bearing" means
+Propagate:
+- New theorem or proposition (statement, not proof)
+- Corrected formula (sign flip, wrong prefactor, wrong argument)
+- New result about the mathematical structure (new pole, new residue value, etc.)
+- Change to a key definition
+- A claim moved from "open" to "established" (or vice versa)
+
+Do NOT propagate:
+- Pedagogical re-derivations of existing results
+- Reorganization / renaming without content change
+- Summary and outlook subsections
+- Typo fixes
+
+When in doubt, ask the user.
+
+## Steps
+
+1. **Identify the change.** Ask the user what changed, or run `git diff main.tex`
+   to see recent edits.
+
+2. **Classify.** Apply the load-bearing filter above. If ambiguous, ask.
+
+3. **Locate the corresponding section in condensed.tex.** Grep for a related
+   label, theorem name, or keyword. Do NOT read condensed.tex in full.
+
+4. **Make the targeted edit.** In condensed.tex:
+   - Add the new theorem statement (without proof)
+   - Replace the old formula with the corrected one
+   - Update the "Status" line (ESTABLISHED / OPEN / CORRECTED)
+   - Add a cross-reference to the main document section label
+
+5. **Compile condensed.tex** (use `/latex-compile condensed.tex`).
+
+6. **Report:**
+   - What was propagated (which result, from which section)
+   - What was deemed not load-bearing and skipped
+   - Compilation status
+
+## Output format
+```
+Propagated: [result name] from sec:[label] → condensed §N (eq. [label])
+Skipped (not load-bearing): [what and why]
+Condensed.tex: M pages, clean.
+```

@@ -1,0 +1,58 @@
+{
+  "_comment": "Generic Claude Code settings for a research project. Copy to your project's .claude/settings.json and adapt.",
+
+  "permissions": {
+    "_comment_allow": "Commands Claude can run without asking for confirmation each time. Add your project's standard tools here.",
+    "allow": [
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add*)",
+      "Bash(git show*)",
+      "Bash(grep*)",
+      "Bash(find . *)",
+      "Bash(ls*)",
+      "Bash(wc*)",
+      "Bash(pdflatex*)",
+      "Bash(bibtex*)",
+      "Bash(latexmk*)"
+    ],
+    "_comment_deny": "Commands Claude should never run without explicit user instruction.",
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)"
+    ]
+  },
+
+  "hooks": {
+    "_comment": "Hooks run shell commands automatically at specific events. Test each hook manually before relying on it.",
+
+    "PreCompact": [
+      {
+        "_comment": "Runs before Claude compresses the conversation context. Use to save current state.",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/pre-compact.sh 2>/dev/null || true",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+
+    "PostToolUse": [
+      {
+        "_comment": "After pushing to GitHub, automatically mirror to GitLab. Adjust matcher to your primary remote name.",
+        "matcher": "Bash(git push github*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/push-gitlab.sh 2>/dev/null || true",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}
