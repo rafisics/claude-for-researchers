@@ -48,7 +48,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash scripts/push-gitlab.sh 2>/dev/null || true",
+            "command": "bash scripts/git-push-both.sh 2>/dev/null || true",
             "timeout": 60
           }
         ]
