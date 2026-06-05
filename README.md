@@ -971,8 +971,8 @@ you want Claude and yourself to be able to diagnose it. "There is a PostToolUse 
 that runs after `git push github*` and mirrors to gitlab" is crucial information when
 debugging a push that went wrong.
 
-See [`.claude/settings.json`](.claude/settings.json) and
-[`.claude/hooks/pre-compact.sh`](.claude/hooks/pre-compact.sh) for working, annotated examples.
+See [`starter/.claude/settings.json`](starter/.claude/settings.json) and
+[`starter/.claude/hooks/pre-compact.sh`](starter/.claude/hooks/pre-compact.sh) for working, annotated examples.
 
 ---
 
@@ -1217,15 +1217,38 @@ but you should not rely on those answers.
 
 ## Templates and scripts in this repo
 
+### Starter package
+
+The fastest way to begin: copy the contents of [`starter/`](starter/) into your
+project root. It gives you everything you need in the right place, ready to fill in.
+
+```
+starter/
+├── CLAUDE.md                        ← fill in your project details
+├── next-session-prompts.md          ← session continuity log
+└── .claude/
+    ├── settings.json                ← permissions + hooks
+    ├── hooks/
+    │   └── pre-compact.sh           ← auto-save before context compression
+    └── skills/
+        ├── latex-compile.md         ← /latex-compile skill
+        └── sync-condensed.md        ← /sync-condensed skill
+```
+
+Copy the files, fill in `CLAUDE.md` with your project's details, and you are ready
+to start your first session.
+
+### Individual files
+
 | File | What it is |
 |------|------------|
-| [`examples/CLAUDE-template.md`](examples/CLAUDE-template.md) | Starting CLAUDE.md for any research project, with all sections and explanatory comments |
+| [`starter/CLAUDE.md`](starter/CLAUDE.md) | Starting CLAUDE.md for any research project, with all sections and explanatory comments |
+| [`starter/next-session-prompts.md`](starter/next-session-prompts.md) | Session log template with format examples |
+| [`starter/.claude/settings.json`](starter/.claude/settings.json) | Annotated generic settings: permissions for research tools + hooks for pre-compact and dual-remote push |
+| [`starter/.claude/hooks/pre-compact.sh`](starter/.claude/hooks/pre-compact.sh) | Pre-compact hook: timestamps CLAUDE.md and snapshots the task log before context compression |
+| [`starter/.claude/skills/latex-compile.md`](starter/.claude/skills/latex-compile.md) | Skill: compile LaTeX, fix common errors, report result |
+| [`starter/.claude/skills/sync-condensed.md`](starter/.claude/skills/sync-condensed.md) | Skill: propagate load-bearing changes from main document to condensed notes |
 | [`examples/condensed-notes-guide.md`](examples/condensed-notes-guide.md) | Detailed guide on what to include and exclude from the condensed notes document |
-| [`examples/next-session-prompts-template.md`](examples/next-session-prompts-template.md) | Session log template with format examples |
-| [`.claude/settings.json`](.claude/settings.json) | Annotated generic settings: permissions for research tools + hooks for pre-compact and dual-remote push |
-| [`.claude/hooks/pre-compact.sh`](.claude/hooks/pre-compact.sh) | Pre-compact hook: timestamps CLAUDE.md and snapshots the task log before context compression |
-| [`.claude/skills/latex-compile.md`](.claude/skills/latex-compile.md) | Skill: compile LaTeX, fix common errors, report result |
-| [`.claude/skills/sync-condensed.md`](.claude/skills/sync-condensed.md) | Skill: propagate load-bearing changes from main document to condensed notes |
 | [`scripts/git-push-both.sh`](scripts/git-push-both.sh) | Dual-remote push: push to GitHub (personal) and GitLab (institution) with separate identities |
 | [`scripts/readme-latex-check.sh`](scripts/readme-latex-check.sh) | Scan a README for LaTeX commands that GitHub's MathJax does not support |
 
