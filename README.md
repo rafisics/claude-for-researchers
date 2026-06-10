@@ -1547,7 +1547,7 @@ description:
 >    using `examples/CLAUDE-template.md` from that repo as the template.
 > 2. Create `.claude/settings.json` (use the starter package version from that repo).
 > 3. Create `.claude/hooks/pre-compact.sh` (use the starter package version).
-> 4. Create `.claude/skills/` with the `latex-compile` and `sync-condensed` skills.
+> 4. Create `.claude/skills/` with the `latex-compile`, `sync-condensed`, and `nb-to-wolfbook` skills.
 > 5. Install rtk if not already installed (`brew install rtk && rtk init -g --auto-patch`).
 > 6. Install the Anthropic pdf skill (`curl` it into `.claude/skills/pdf.md`).
 > 7. Install the Wolfbook VS Code extension (`code --install-extension vanbaalon.wolfbook`).
@@ -1565,6 +1565,11 @@ carefully. The structure, hooks, and settings will be correct by construction. T
 parts that need your attention are the domain-specific sections — Conventions and
 Current status — because those require your knowledge to get right. Correct anything
 Claude misunderstood about your project, and you are ready to begin.
+
+**If you have existing Mathematica notebooks or scripts**, run `/nb-to-wolfbook` on
+them after setup is complete. Point it at a file or a whole directory and it will
+convert everything to Wolfbook's `.wb` format in one step — re-run the cells
+afterwards to regenerate output.
 
 This works because Claude Code can read a GitHub repository, run shell commands, and
 create files, and because the guide it is reading contains explicit templates and
