@@ -239,8 +239,12 @@ description:
 >    `nb-to-wolfbook`, `verify-citation`, `reality-check`, and `cross-validate` skills
 >    (all in the starter package).
 > 5. Install rtk if not already installed (`brew install rtk && rtk init -g --auto-patch`).
-> 6. Install the Anthropic pdf skill (`curl` it into `.claude/skills/pdf.md`).
-> 7. Install the Wolfbook VS Code extension (`code --install-extension vanbaalon.wolfbook`).
+> 6. Install the Anthropic pdf skill:
+>    ```
+>    curl -o .claude/skills/pdf.md \
+>      https://raw.githubusercontent.com/anthropics/skills/main/skills/pdf/SKILL.md
+>    ```
+> 7. Install the Wolfbook VS Code extension (`code --install-extension wolfbook.wolfbook`).
 > 8. Initialise a git repo if one does not exist.
 >
 > Fill in `CLAUDE.md`'s Conventions, File map, and Current status sections from what
@@ -1245,8 +1249,8 @@ with it in this workflow. It is a free, open-source VS Code extension that runs
 Wolfram Language notebooks directly inside VS Code — cell-by-cell evaluation,
 LaTeX-rendered output, and inline graphics, connected to your local Mathematica
 kernel. Install from the
-[VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=vanbaalon.wolfbook)
-or from [github.com/vanbaalon/wolfbook](https://github.com/vanbaalon/wolfbook).
+[VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=wolfbook.wolfbook)
+(extension ID: `wolfbook.wolfbook`).
 
 Wolfram's own VS Code extension is significantly worse. The Mathematica desktop
 application requires an expensive licence for every machine you use and does not
