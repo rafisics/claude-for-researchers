@@ -52,8 +52,8 @@ domain as a function of their spectral parameters, using the Rankin–Selberg un
 In chat replies, do NOT use LaTeX markup ($...$, \frac, \xi, etc.) — it does not
 render in Claude Code's chat window. Write math in plain Unicode:
   ξ, μ, σ, Γ, ζ, ∑, ∏, ∫, √, ½, →, ≈, ≠, ≤, ⇒
-  subscripts: M_3, μ_0, s_i
-  powers: e^{-π t}, τ^{-2}
+  single subscripts/superscripts (one char): M₃, μ₀, sᵢ, x², yⁿ
+  multi-char sub/superscripts: M_{ab}, e^{-π t}, τ^{-2}
 LaTeX belongs ONLY inside .tex files.
 
 ## Skills
@@ -75,6 +75,27 @@ computation gives." If in doubt, over-explain.
 
 [Adapt this section to your own preference — some researchers want the opposite:
  terse, theorem-style prose. Be explicit either way.]
+
+## Structure and cross-references in main.tex (IMPORTANT)
+<!-- Claude navigates main.tex with grep and targeted reads, not by reading top to bottom.
+     These rules make that navigation reliable. -->
+
+- Use \label on every section, subsection, theorem, proposition, equation, and figure.
+  Cross-reference explicitly with \ref / \eqref. More cross-references than you would
+  write for a human reader is the right amount.
+- Maintain a clear section hierarchy (sections → subsections → subsubsections with
+  meaningful names). Flat structure makes targeted reads unreliable.
+
+## Corrections in main.tex (NON-NEGOTIABLE)
+<!-- This rule prevents Claude from working from wrong information in future sessions. -->
+
+If something in main.tex is discovered to be wrong, REPLACE IT IN PLACE. Do not
+append a correction paragraph later ("earlier I claimed X, but actually Y").
+
+Reason: Claude reads different parts of main.tex in each session. If the wrong
+version stays in the file and the correction is only further down, Claude may read
+the wrong statement in a later session and never see the correction. It will then
+work from incorrect information, confidently.
 
 ## Numerics
 <!-- Primary computation engine, venv location, any gotchas. -->

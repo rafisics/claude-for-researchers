@@ -68,20 +68,24 @@ Use it only to check that the guide's advice matches what actually worked.
 
 ## Git for this repo
 - Repo location: `/Users/mehregandoroudiani/Physics/AI for physics/claude-for-researchers`
-- Remote 'origin': https://github.com/Mexregkan/claude-for-researchers.git (public)
-- Remote 'private': a private GitHub/GitLab repo for backing up personal branches (set up separately — see below)
+- Remote `origin`: https://github.com/Mexregkan/claude-for-researchers.git (public)
+- Remote `private-gh`: https://github.com/Mexregkan/claude-for-researchers-private.git (private GitHub)
+- Remote `private-gl`: git@git.soton.ac.uk:md1c24/claude-for-researchers-private.git (private university GitLab, SSH)
 - Push public work: `git push origin main`
-- Push private branch for backup: `git push private <branch-name>`
+- Push experimental branch to GitHub: `git push private-gh <branch-name>`
+- Push experimental branch to GitLab: `git push private-gl <branch-name>`
 - Commit author: Mehregan Doroudiani <287984940+mehregandoroudiani-ship-it@users.noreply.github.com>
 - No Co-Authored-By trailers.
 
-## Private remote setup
-To add the private remote once you've created the private repo:
-```
-git remote add private <YOUR_PRIVATE_REPO_URL>
-```
-Personal/experimental branches are never pushed to `origin` until ready to make public.
+## Branch workflow
+Experimental/private branches are never pushed to `origin` until ready to make public.
 Only `main` (and branches explicitly chosen) go to `origin`.
+To start a new private branch:
+```
+git checkout -b my-experiment
+git push private-gh my-experiment   # back up to private GitHub
+git push private-gl my-experiment   # back up to university GitLab
+```
 
 ## What NOT to include
 - Anything from the source physics project (content, formulas, results)
@@ -89,5 +93,9 @@ Only `main` (and branches explicitly chosen) go to `origin`.
 - Any claim that Claude is a research collaborator or co-author (it is a tool)
 
 ## ⚠️ Auto-saved before context compact [2026-06-05 20:54]
+Session was compacted. Last known state is in the "Current status" section above.
+To resume: start new session, open next-session-prompts.md, paste the top prompt.
+
+## ⚠️ Auto-saved before context compact [2026-06-10 13:47]
 Session was compacted. Last known state is in the "Current status" section above.
 To resume: start new session, open next-session-prompts.md, paste the top prompt.

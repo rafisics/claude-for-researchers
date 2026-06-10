@@ -52,8 +52,8 @@ domain as a function of their spectral parameters, using the Rankin–Selberg un
 In chat replies, do NOT use LaTeX markup ($...$, \frac, \xi, etc.) — it does not
 render in Claude Code's chat window. Write math in plain Unicode:
   ξ, μ, σ, Γ, ζ, ∑, ∏, ∫, √, ½, →, ≈, ≠, ≤, ⇒
-  subscripts: M_3, μ_0, s_i
-  powers: e^{-π t}, τ^{-2}
+  single subscripts/superscripts (one char): M₃, μ₀, sᵢ, x², yⁿ
+  multi-char sub/superscripts: M_{ab}, e^{-π t}, τ^{-2}
 LaTeX belongs ONLY inside .tex files.
 
 ## Skills
