@@ -225,42 +225,50 @@ it would need to know. Cover:
 Do not worry about structure. Write it conversationally. The more you say, the
 better the generated CLAUDE.md will be.
 
-**Step 4 — Ask Claude to initialise the project.** Paste this prompt after your
-description:
+**Step 4 — Paste the first setup message.** This creates all the files without
+running any shell commands. No permission prompts will appear.
 
 > I want to set up this project using the workflow at
-> https://github.com/Mexregkan/claude-for-researchers/. Please:
-> 1. Create `CLAUDE.md` populated with the project details I just described,
->    using `examples/CLAUDE-template.md` from that repo as the template.
-> 2. Create `.claude/settings.json` (use the starter package version from that repo).
-> 3. Create `.claude/hooks/pre-compact.sh` and `.claude/hooks/promise-checker.sh`
+> https://github.com/Mexregkan/claude-for-researchers/. Do only the following —
+> create files, do not run any shell commands yet.
+>
+> 1. Create `.claude/settings.json` (use the starter package version from that repo).
+> 2. Create `.claude/hooks/pre-compact.sh` and `.claude/hooks/promise-checker.sh`
 >    (use the starter package versions from that repo).
-> 4. Create `.claude/skills/` with the `latex-compile`, `sync-condensed`,
+> 3. Create `.claude/skills/` with the `latex-compile`, `sync-condensed`,
 >    `nb-to-wolfbook`, `verify-citation`, `reality-check`, and `cross-validate` skills
 >    (all in the starter package).
+> 4. Create `CLAUDE.md` populated with the project details I just described,
+>    using `examples/CLAUDE-template.md` from that repo as the template.
+>    Fill in the Conventions, File map, and Current status sections from what I told you.
 > 5. Copy `next-session-prompts.md` from the starter package into the project root.
 > 6. If `main.tex` does not already exist, copy `starter/main.tex` from that repo
->    as a starting stub — do not overwrite an existing file.
+>    as a stub. Do not overwrite an existing file.
 > 7. If `condensed.tex` does not already exist, copy `starter/condensed.tex` from
->    that repo as a starting stub — do not overwrite an existing file.
-> 8. Install rtk if not already installed (`brew install rtk && rtk init -g --auto-patch`).
-> 9. Install the Anthropic pdf skill:
+>    that repo as a stub. Do not overwrite an existing file.
+>    Update the title and author fields in both stubs with the project details I described.
+>
+> When all files are created, stop and tell me "Files ready — please restart Claude Code."
+
+**Step 5 — Restart Claude Code.** Close the chat panel and reopen it (or close
+and reopen VS Code entirely). This loads the new `settings.json`, which grants
+permission for all shell commands from this point on.
+
+**Step 6 — Paste the second setup message.** Now Claude can run shell commands
+without any prompts.
+
+> Please complete the project setup:
+>
+> 1. Install rtk if not already installed (`brew install rtk && rtk init -g --auto-patch`).
+> 2. Install the Anthropic pdf skill:
 >    ```
 >    curl -o .claude/skills/pdf.md \
 >      https://raw.githubusercontent.com/anthropics/skills/main/skills/pdf/SKILL.md
 >    ```
-> 10. Install the Wolfbook VS Code extension (`code --install-extension wolfbook.wolfbook`).
-> 11. Initialise a git repo if one does not exist.
->
-> Fill in `CLAUDE.md`'s Conventions, File map, and Current status sections from what
-> I told you about the project. Also update the title and author fields in `main.tex`
-> and `condensed.tex` with the project details I described.
+> 3. Install the Wolfbook VS Code extension (`code --install-extension wolfbook.wolfbook`).
+> 4. Initialise a git repo if one does not exist (`git init`).
 
-Claude will read the guide, download the starter files, install the tools, create
-the directory structure, and write a CLAUDE.md populated with your project's details.
-The whole thing takes a few minutes.
-
-**Step 5 — Review what Claude produced.** Read through the generated `CLAUDE.md`
+**Step 7 — Review what Claude produced.** Read through the generated `CLAUDE.md`
 carefully. The structure, hooks, and settings will be correct by construction. The
 parts that need your attention are the domain-specific sections — Conventions and
 Current status — because those require your knowledge to get right. Correct anything
@@ -270,6 +278,11 @@ Claude misunderstood about your project, and you are ready to begin.
 them after setup is complete. Point it at a file or a whole directory and it will
 convert everything to Wolfbook's `.wb` format in one step — re-run the cells
 afterwards to regenerate output.
+
+The restart between the two messages is necessary because Claude Code loads
+`settings.json` once at session start. Without it, the shell commands in the second
+message would trigger permission prompts. With it, they run silently. The restart
+takes ten seconds and only happens once per project.
 
 This works because Claude Code can read a GitHub repository, run shell commands, and
 create files, and because the guide it is reading contains explicit templates and
