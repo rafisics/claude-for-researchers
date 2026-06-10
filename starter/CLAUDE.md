@@ -63,6 +63,8 @@ LaTeX belongs ONLY inside .tex files.
   Use after any edit to a .tex file.
 - `/sync-condensed` — propagate load-bearing changes from main.tex to condensed.tex.
   Use after establishing a new result.
+- `/nb-to-wolfbook` — convert .nb notebooks or .m scripts to Wolfbook's .wb format.
+  Use when migrating existing Mathematica files to work in VS Code with Wolfbook.
 
 ## Writing style in main.tex (IMPORTANT)
 <!-- Tell Claude how detailed to be when writing in your main document.

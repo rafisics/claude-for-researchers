@@ -1359,12 +1359,14 @@ understand your symbolic computations, `.wb` is the right format.
 **For new work:** start in `.wb` from the beginning. The workflow is the same as
 a Mathematica notebook — you write cells, evaluate them, see output inline.
 
-**For existing `.nb` notebooks:** Wolfbook does not open `.nb` files directly.
-Two converters are available if you need to migrate old work:
-- [mathematica2jupyter](https://github.com/divenex/mathematica2jupyter) — converts `.nb` to VS Code notebook format
-- [nb2wlnb_converter](https://github.com/FlorentinJ/nb2wlnb_converter) — similar utility
-
-Convert once, then work in `.wb` going forward.
+**For existing `.nb` notebooks and `.m` scripts:** use the `/nb-to-wolfbook` skill
+included in the starter package. Run `/nb-to-wolfbook <file>` (or point it at a
+directory to convert everything at once). The skill tries wolframscript first — if
+that is available it exports the notebook content directly; otherwise it falls back
+to [mathematica2jupyter](https://github.com/divenex/mathematica2jupyter). Output
+cells (computed results) are not preserved in the conversion — re-run the cells
+after opening the `.wb` file in VS Code. Graphics-heavy notebooks may need minor
+manual cleanup. Convert once, then work in `.wb` going forward.
 
 **Plain `.m` script files** (not notebooks) work well for computation scripts that
 Claude runs or modifies. Claude reads and edits `.m` files the same as Python
@@ -1485,7 +1487,8 @@ starter/
     │   └── pre-compact.sh           ← auto-save before context compression
     └── skills/
         ├── latex-compile.md         ← /latex-compile skill
-        └── sync-condensed.md        ← /sync-condensed skill
+        ├── sync-condensed.md        ← /sync-condensed skill
+        └── nb-to-wolfbook.md        ← /nb-to-wolfbook skill
 ```
 
 Copy the files, fill in `CLAUDE.md` with your project's details, and you are ready
@@ -1504,6 +1507,7 @@ below.
 | [`starter/.claude/hooks/pre-compact.sh`](starter/.claude/hooks/pre-compact.sh) | Pre-compact hook: timestamps CLAUDE.md and snapshots the task log before context compression |
 | [`starter/.claude/skills/latex-compile.md`](starter/.claude/skills/latex-compile.md) | Skill: compile LaTeX, fix common errors, report result |
 | [`starter/.claude/skills/sync-condensed.md`](starter/.claude/skills/sync-condensed.md) | Skill: propagate load-bearing changes from main document to condensed notes |
+| [`starter/.claude/skills/nb-to-wolfbook.md`](starter/.claude/skills/nb-to-wolfbook.md) | Skill: convert .nb notebooks and .m scripts to Wolfbook's .wb format |
 | [`examples/CLAUDE-template.md`](examples/CLAUDE-template.md) | Heavily commented CLAUDE.md template with all sections; use as the base when filling in manually |
 | [`examples/next-session-prompts-template.md`](examples/next-session-prompts-template.md) | Session log template with worked examples of well-written task descriptions |
 | [`examples/condensed-notes-guide.md`](examples/condensed-notes-guide.md) | Detailed guide on what to include and exclude from the condensed notes document |
