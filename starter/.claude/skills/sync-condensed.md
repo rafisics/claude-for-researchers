@@ -25,7 +25,7 @@ When in doubt, ask the user.
 
 ## Steps
 
-1. **Identify the change.** Ask the user what changed, or run `git diff manuscript.tex`
+1. **Identify the change.** Ask the user what changed, or run `git diff workbook.tex`
    to see recent edits.
 
 2. **Classify.** Apply the load-bearing filter above. If ambiguous, ask.
