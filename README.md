@@ -1403,27 +1403,33 @@ dangerous ones explicitly**:
 "permissions": {
   "allow": ["Bash"],
   "deny": [
-    "Bash(rm:*)",
-    "Bash(rmdir:*)",
-    "Bash(shred:*)",
-    "Bash(dd:*)",
-    "Bash(sudo:*)",
-    "Bash(git clean:*)",
-    "Bash(git reset --hard:*)",
-    "Bash(git checkout --:*)",
-    "Bash(* rm -rf *)",
-    "Bash(find * -delete*)"
+    "Bash(rm -rf*)",
+    "Bash(rm -r*)",
+    "Bash(shred*)",
+    "Bash(dd if=*)",
+    "Bash(sudo*)",
+    "Bash(git clean*)",
+    "Bash(git reset --hard*)",
+    "Bash(git checkout --*)",
+    "Bash(git push --force*)",
+    "Bash(git push -f*)",
+    "Bash(find* -delete*)",
+    "Bash(find* -exec rm*)",
+    "Bash(chmod -R 777*)",
+    "Bash(mkfs*)",
+    "Bash(fdisk*)"
   ]
 }
 ```
 
-`"allow": ["Bash"]` approves all shell commands by default. The `deny` list then
-blocks the ones you never want Claude to run — deletion, privilege escalation, and
-destructive git operations. Anything in `deny` takes precedence over `allow`.
+`"allow": ["Bash"]` approves all shell commands by default — no more permission
+prompts for compiling LaTeX, running Python, or using git. The `deny` list blocks
+the commands you never want Claude to run: irreversible deletions, privilege
+escalation, and destructive git operations. Anything in `deny` takes precedence
+over `allow`.
 
-This is what the starter package uses. Copy
-[`starter/.claude/settings.json`](starter/.claude/settings.json) rather than
-writing your own from scratch — it has the full deny list and annotated comments.
+The starter package [`starter/.claude/settings.json`](starter/.claude/settings.json)
+uses exactly this configuration. Copy it rather than writing your own from scratch.
 
 ### Hooks
 

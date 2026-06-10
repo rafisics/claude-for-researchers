@@ -2,35 +2,35 @@
   "_comment": "Generic Claude Code settings for a research project. Copy to your project's .claude/settings.json and adapt.",
 
   "permissions": {
-    "_comment_allow": "Commands Claude can run without asking for confirmation each time. Add your project's standard tools here.",
-    "allow": [
-      "Bash(git status)",
-      "Bash(git diff*)",
-      "Bash(git log*)",
-      "Bash(git add*)",
-      "Bash(git show*)",
-      "Bash(grep*)",
-      "Bash(find . *)",
-      "Bash(ls*)",
-      "Bash(wc*)",
-      "Bash(pdflatex*)",
-      "Bash(bibtex*)",
-      "Bash(latexmk*)"
-    ],
-    "_comment_deny": "Commands Claude should never run without explicit user instruction.",
+    "_comment_allow": "Allow all Bash commands by default. The deny list below blocks the dangerous ones. This means Claude can compile LaTeX, run Python scripts, use git, install packages, and run any standard research tool without asking for permission each time.",
+    "allow": ["Bash"],
+
+    "_comment_deny": "These commands are never allowed without explicit user instruction. 'deny' takes precedence over 'allow'.",
     "deny": [
-      "Bash(rm -rf *)",
+      "Bash(rm -rf*)",
+      "Bash(rm -r*)",
+      "Bash(shred*)",
+      "Bash(dd if=*)",
+      "Bash(sudo*)",
+      "Bash(git clean*)",
+      "Bash(git reset --hard*)",
+      "Bash(git checkout --*)",
       "Bash(git push --force*)",
-      "Bash(git reset --hard*)"
+      "Bash(git push -f*)",
+      "Bash(find* -delete*)",
+      "Bash(find* -exec rm*)",
+      "Bash(chmod -R 777*)",
+      "Bash(mkfs*)",
+      "Bash(fdisk*)"
     ]
   },
 
   "hooks": {
-    "_comment": "Hooks run shell commands automatically at specific events. Test each hook manually before relying on it.",
+    "_comment": "Hooks run shell commands automatically at specific events. Test each hook manually before relying on it. Document every hook in CLAUDE.md so you can diagnose unexpected behaviour.",
 
     "PreCompact": [
       {
-        "_comment": "Runs before Claude compresses the conversation context. Use to save current state.",
+        "_comment": "Runs before Claude compresses the conversation context. Stamps CLAUDE.md and snapshots the task log so you never lose track of where you were.",
         "hooks": [
           {
             "type": "command",
@@ -43,7 +43,7 @@
 
     "PostToolUse": [
       {
-        "_comment": "After pushing to GitHub, automatically mirror to GitLab. Adjust matcher to your primary remote name.",
+        "_comment": "After pushing to GitHub, automatically mirror to GitLab. Adjust matcher to your primary remote name. Remove this hook if you only have one remote.",
         "matcher": "Bash(git push github*)",
         "hooks": [
           {
@@ -57,7 +57,7 @@
 
     "Stop": [
       {
-        "_comment": "Checks whether Claude said 'I'll remember / I've noted / I've saved' without actually writing a file. Catches performative compliance — Claude claiming to have persisted something without doing it. Adapted from flonat/claude-research.",
+        "_comment": "Catches 'I'll remember / I've noted / I've saved' said without actually writing a file — performative compliance. Prompts Claude to follow through. Adapted from flonat/claude-research.",
         "hooks": [
           {
             "type": "command",
