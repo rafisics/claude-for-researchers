@@ -1333,13 +1333,42 @@ exactly across different versions.
 `wolframscript` runs Mathematica headlessly from the command line and can be invoked
 from a shell script or Claude session — the recommended interface if you have Mathematica.
 
-**Using Mathematica in VS Code:** install [Wolfbook](https://wolfbook.app/) — a free,
-open-source extension that runs Wolfram Language notebooks directly inside VS Code,
-with cell-by-cell evaluation, LaTeX-rendered output, and graphics inline. It is
-significantly better than Wolfram's own VS Code integration. Install from the
+### Wolfbook: Mathematica notebooks in VS Code
+
+If you use Mathematica, [Wolfbook](https://wolfbook.app/) is the right way to work
+with it in this workflow. It is a free, open-source VS Code extension that runs
+Wolfram Language notebooks directly inside VS Code — cell-by-cell evaluation,
+LaTeX-rendered output, and inline graphics, connected to your local Mathematica
+kernel. Install from the
 [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=vanbaalon.wolfbook)
-or find the source at [github.com/vanbaalon/wolfbook](https://github.com/vanbaalon/wolfbook).
-Requires a local Mathematica installation.
+or from [github.com/vanbaalon/wolfbook](https://github.com/vanbaalon/wolfbook).
+
+Wolfram's own VS Code extension is significantly worse. The Mathematica desktop
+application requires an expensive licence for every machine you use and does not
+integrate with your git workflow or with Claude. Wolfbook is free; only the
+Mathematica kernel licence costs anything.
+
+**File format: .wb, not .nb.** Wolfbook uses its own `.wb` format — plain text,
+Git-diffable, and directly readable by Claude. This matters: Claude can open a
+`.wb` notebook, understand what computations you ran and what results came out,
+and help you debug or extend them without any special handling. Mathematica's
+native `.nb` format is a proprietary binary that Claude cannot read and that does
+not version-control cleanly. For a research project where you want Claude to
+understand your symbolic computations, `.wb` is the right format.
+
+**For new work:** start in `.wb` from the beginning. The workflow is the same as
+a Mathematica notebook — you write cells, evaluate them, see output inline.
+
+**For existing `.nb` notebooks:** Wolfbook does not open `.nb` files directly.
+Two converters are available if you need to migrate old work:
+- [mathematica2jupyter](https://github.com/divenex/mathematica2jupyter) — converts `.nb` to VS Code notebook format
+- [nb2wlnb_converter](https://github.com/FlorentinJ/nb2wlnb_converter) — similar utility
+
+Convert once, then work in `.wb` going forward.
+
+**Plain `.m` script files** (not notebooks) work well for computation scripts that
+Claude runs or modifies. Claude reads and edits `.m` files the same as Python
+scripts — no special handling needed.
 
 ### Precision discipline
 
@@ -1517,7 +1546,8 @@ description:
 > 4. Create `.claude/skills/` with the `latex-compile` and `sync-condensed` skills.
 > 5. Install rtk if not already installed (`brew install rtk && rtk init -g --auto-patch`).
 > 6. Install the Anthropic pdf skill (`curl` it into `.claude/skills/pdf.md`).
-> 7. Initialise a git repo if one does not exist.
+> 7. Install the Wolfbook VS Code extension (`code --install-extension vanbaalon.wolfbook`).
+> 8. Initialise a git repo if one does not exist.
 >
 > Fill in `CLAUDE.md`'s Conventions, File map, and Current status sections from what
 > I told you about the project.
