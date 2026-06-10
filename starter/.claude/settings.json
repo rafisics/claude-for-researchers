@@ -53,6 +53,19 @@
           }
         ]
       }
+    ],
+
+    "Stop": [
+      {
+        "_comment": "Checks whether Claude said 'I'll remember / I've noted / I've saved' without actually writing a file. Catches performative compliance — Claude claiming to have persisted something without doing it. Adapted from flonat/claude-research.",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/promise-checker.sh 2>/dev/null || true",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }

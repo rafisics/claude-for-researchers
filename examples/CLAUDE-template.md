@@ -99,12 +99,37 @@ version stays in the file and the correction is only further down, Claude may re
 the wrong statement in a later session and never see the correction. It will then
 work from incorrect information, confidently.
 
+## Citations (NON-NEGOTIABLE)
+<!-- This rule prevents fabricated references from entering the paper. -->
+
+Never write a citation into any file without first verifying the paper exists on
+Semantic Scholar, arXiv, or OpenAlex. Use /verify-citation before adding any reference.
+If you cannot confirm the paper exists, say so — do not invent a plausible alternative.
+
+## Anti-sycophancy rule (IMPORTANT)
+<!-- This rule makes capitulation visible and reversible. -->
+
+If you change your answer because I expressed doubt or disagreement, say so explicitly:
+"I am revising my earlier answer because you pushed back."
+Do not quietly update a formula or derivation without flagging the change.
+
+If I ask you to check a contested result, re-derive it from the definitions in
+this file — do not let the prior conversation influence the derivation.
+
+## AI-generated outputs
+<!-- Keeps AI-produced results separate from your own computations. -->
+
+All plots, tables, and numerical outputs you produce go in `numerics/generated/`
+or `figures/generated/` until I have reviewed them and traced them to a committed
+script. Never include `generated/` content in main.tex without my explicit instruction.
+
 ## Numerics
 <!-- Primary computation engine, venv location, any gotchas. -->
 
 - Primary engine: Python + mpmath (precision: `mp.dps = 30` unless stated otherwise)
 - venv: `numerics/venv/` — run scripts as `numerics/venv/bin/python numerics/script.py`
 - Route all long-running output to `numerics/run.log`
+- AI-produced outputs: `numerics/generated/` (provisional, requires review before use)
 
 ## Git
 <!-- Remote setup, identity, push procedure. -->

@@ -10,30 +10,71 @@ the failure modes you will hit, and how to set up a workflow that survives them.
 
 ---
 
-## Table of Contents
+## How to read this guide
 
-0. [Installation and first launch](#installation-and-first-launch)
-1. [Quick-start flowcharts](#quick-start-flowcharts)
-2. [The right mental model](#the-right-mental-model)
-3. [CLAUDE.md: the most important file](#claudemd-the-most-important-file)
-4. [Skills: reusable procedures](#skills-reusable-procedures)
-5. [The dual-document pattern: main.tex and condensed.tex](#the-dual-document-pattern-maintex-and-condensedtex)
-6. [Session continuity: next-session-prompts.md](#session-continuity-next-session-promptsmd)
-7. [Session length and context limits](#session-length-and-context-limits)
-8. [Settings and hooks](#settings-and-hooks)
-9. [Reducing token consumption: rtk](#reducing-token-consumption-rtk)
-10. [Git workflow for academics](#git-workflow-for-academics)
-11. [GitHub README and LaTeX](#github-readme-and-latex)
-12. [Numerics and computation](#numerics-and-computation)
-13. [Honest limitations](#honest-limitations)
-14. [Templates and scripts in this repo](#templates-and-scripts-in-this-repo)
+This guide serves two audiences at once, so it is organised in parts:
+
+- **Never used Claude Code?** Read [Part I](#part-i-getting-started) from the top.
+  It takes you from nothing to a fully configured project — including a step where
+  Claude does the setup for you. Then read Part II gradually, as the topics become
+  relevant to your work. You do not need anything in Part III to be productive.
+- **Already using Claude Code?** Skip Part I (except perhaps
+  [Bootstrapping](#bootstrapping-a-new-project-with-claude), which is useful for any
+  new project) and start with [Part II](#part-ii-the-core-workflow) — the workflow
+  patterns there are the heart of this guide. Add the machinery in
+  [Part III](#part-iii-power-tools) when you want it.
+- **Everyone**, whatever your experience level: read
+  [Honest limitations](#honest-limitations) before trusting anything Claude produces.
+  The failure modes described there are not edge cases.
 
 ---
+
+## Table of Contents
+
+**[Part I: Getting started](#part-i-getting-started)** — *for readers new to Claude Code*
+
+1. [Installation and first launch](#installation-and-first-launch)
+2. [Bootstrapping a new project with Claude](#bootstrapping-a-new-project-with-claude)
+3. [Quick-start flowcharts](#quick-start-flowcharts)
+4. [The right mental model](#the-right-mental-model)
+
+**[Part II: The core workflow](#part-ii-the-core-workflow)** — *the heart of the guide, for everyone*
+
+5. [CLAUDE.md: the most important file](#claudemd-the-most-important-file)
+6. [The dual-document pattern: main.tex and condensed.tex](#the-dual-document-pattern-maintex-and-condensedtex)
+7. [Session continuity: next-session-prompts.md](#session-continuity-next-session-promptsmd)
+8. [Session length and context limits](#session-length-and-context-limits)
+9. [Skills: reusable procedures](#skills-reusable-procedures)
+10. [Git workflow for academics](#git-workflow-for-academics)
+11. [Numerics and computation](#numerics-and-computation)
+
+**[Part III: Power tools](#part-iii-power-tools)** — *optional; adopt once the basics feel comfortable*
+
+12. [Settings and hooks](#settings-and-hooks)
+13. [Reducing token consumption: rtk](#reducing-token-consumption-rtk)
+14. [GitHub README and LaTeX](#github-readme-and-latex)
+
+**[Part IV: What Claude gets wrong](#part-iv-what-claude-gets-wrong)** — *required reading*
+
+15. [Honest limitations](#honest-limitations)
+
+**[Appendix](#appendix)**
+
+16. [Templates and scripts in this repo](#templates-and-scripts-in-this-repo)
+
+---
+
+# Part I: Getting started
+
+*New to Claude Code? Start here. By the end of this part you will have a working
+installation and a fully configured research project — most of it set up by Claude
+itself. Experienced users can skip ahead to [Part II](#part-ii-the-core-workflow).*
 
 ## Installation and first launch
 
 This section is for readers who have never used VS Code or Claude Code before.
-If you are already set up, skip to [Quick-start flowcharts](#quick-start-flowcharts).
+If you are already set up, skip to
+[Bootstrapping a new project with Claude](#bootstrapping-a-new-project-with-claude).
 
 ### What you need
 
@@ -139,7 +180,7 @@ nothing about your work.
 You can write it by hand — the [CLAUDE.md section](#claudemd-the-most-important-file)
 below explains exactly what to put in it. Or, for the fastest path, skip to
 [Bootstrapping a new project with Claude](#bootstrapping-a-new-project-with-claude)
-at the end of this guide: describe your project to Claude in plain language, point
+— the next section: describe your project to Claude in plain language, point
 it at this guide, and it will create all the files and install all the tools for you.
 
 ---
@@ -153,6 +194,77 @@ API tokens, depending on how much context is loaded and how many files are read.
 You can track your usage at
 [console.anthropic.com/usage](https://console.anthropic.com/usage). If you have
 a Claude Pro subscription, Claude Code usage is included in that plan.
+
+---
+
+## Bootstrapping a new project with Claude
+
+The fastest path from nothing to a fully configured research project is to let
+Claude do the setup for you — once. Here is how.
+
+This section mentions pieces that are explained later in the guide — CLAUDE.md,
+skills, hooks. You do not need to understand them first: set the project up now,
+and learn what each piece does in Part II as you start working.
+
+**Step 1 — Gather your materials.** Create a folder for the project. Put in it
+whatever you have: a LaTeX draft, reference PDFs, computation scripts, handwritten
+notes scanned to PDF, a plain-text outline. It does not matter how raw the state is.
+
+**Step 2 — Open the folder in VS Code and start a Claude Code session.**
+
+**Step 3 — Describe the project.** In your first message, tell Claude everything
+it would need to know. Cover:
+- What the project is and what mathematical or scientific object you are studying
+- The open question you are working toward
+- The files you added and what each one is for
+- The notation and conventions you use (including sign and normalisation choices)
+- Your preferences: how detailed should LaTeX write-ups be, what is your git remote
+  setup, do you use Mathematica or Python for numerics, etc.
+- Anything else you would put in a CLAUDE.md if you were writing it by hand
+
+Do not worry about structure. Write it conversationally. The more you say, the
+better the generated CLAUDE.md will be.
+
+**Step 4 — Ask Claude to initialise the project.** Paste this prompt after your
+description:
+
+> I want to set up this project using the workflow at
+> https://github.com/Mexregkan/claude-for-researchers/. Please:
+> 1. Create `CLAUDE.md` populated with the project details I just described,
+>    using `examples/CLAUDE-template.md` from that repo as the template.
+> 2. Create `.claude/settings.json` (use the starter package version from that repo).
+> 3. Create `.claude/hooks/pre-compact.sh` and `.claude/hooks/promise-checker.sh`
+>    (use the starter package versions from that repo).
+> 4. Create `.claude/skills/` with the `latex-compile`, `sync-condensed`,
+>    `nb-to-wolfbook`, `verify-citation`, `reality-check`, and `cross-validate` skills
+>    (all in the starter package).
+> 5. Install rtk if not already installed (`brew install rtk && rtk init -g --auto-patch`).
+> 6. Install the Anthropic pdf skill (`curl` it into `.claude/skills/pdf.md`).
+> 7. Install the Wolfbook VS Code extension (`code --install-extension vanbaalon.wolfbook`).
+> 8. Initialise a git repo if one does not exist.
+>
+> Fill in `CLAUDE.md`'s Conventions, File map, and Current status sections from what
+> I told you about the project.
+
+Claude will read the guide, download the starter files, install the tools, create
+the directory structure, and write a CLAUDE.md populated with your project's details.
+The whole thing takes a few minutes.
+
+**Step 5 — Review what Claude produced.** Read through the generated `CLAUDE.md`
+carefully. The structure, hooks, and settings will be correct by construction. The
+parts that need your attention are the domain-specific sections — Conventions and
+Current status — because those require your knowledge to get right. Correct anything
+Claude misunderstood about your project, and you are ready to begin.
+
+**If you have existing Mathematica notebooks or scripts**, run `/nb-to-wolfbook` on
+them after setup is complete. Point it at a file or a whole directory and it will
+convert everything to Wolfbook's `.wb` format in one step — re-run the cells
+afterwards to regenerate output.
+
+This works because Claude Code can read a GitHub repository, run shell commands, and
+create files, and because the guide it is reading contains explicit templates and
+instructions it can follow directly. The setup task is exactly the kind of structured,
+mechanical work Claude does reliably. The research that follows is yours.
 
 ---
 
@@ -203,6 +315,13 @@ model actually work in practice: it keeps Claude well-informed about your projec
 tells it precisely what to do, and keeps you in control of all decisions that matter.
 
 ---
+
+# Part II: The core workflow
+
+*The heart of the guide: how to organise a long research project so that every
+Claude session is productive. This part is for everyone — but you do not need to
+read it all on day one. Start working, and come back to each topic as it becomes
+relevant.*
 
 ## CLAUDE.md: the most important file
 
@@ -493,164 +612,6 @@ plausible-looking sign or normalisation error.
 in chat" or "show every step in main.tex" need to be in CLAUDE.md permanently, not
 said once in conversation. Claude does not remember conversation instructions between
 sessions.
-
----
-
-## Skills: reusable procedures
-
-### What skills are
-
-Skills are named, reusable instruction sets for Claude. You define a skill once by
-writing a Markdown file in `.claude/skills/`. After that, any time you type
-`/skill-name` in your Claude Code session, Claude executes that skill.
-
-Think of skills as macros or procedures: instead of explaining a multi-step process
-every time you need it, you write it once and invoke it by name. Claude reads the
-skill file and follows the instructions in it.
-
-Skills are different from CLAUDE.md instructions in an important way: CLAUDE.md
-is always active (Claude reads it every session). Skills are invoked on demand.
-Use CLAUDE.md for standing instructions about how to behave; use skills for
-specific procedures you want to run on demand.
-
-### Why skills are useful
-
-Without skills, you find yourself typing the same instructions over and over:
-"Compile main.tex, fix any errors, tell me the page count and any overfull boxes."
-With a skill, you type `/latex-compile` and Claude does exactly that procedure,
-exactly the same way, every time.
-
-For research, the most valuable skills are:
-
-**Compilation skills** — compile your document, catch a specific class of errors,
-report in a standard format. Without a skill, you either write these instructions
-every time or get inconsistent behavior.
-
-**Sync skills** — propagate changes between related documents (e.g., from your
-full paper to your condensed notes). The criteria for what to propagate are subtle;
-writing them once in a skill ensures consistent judgment across sessions.
-
-**Verification skills** — run a specific check against current results. For
-mathematical projects, this might be "verify that this formula gives the right
-residue at a specific point." Writing the check protocol in a skill means Claude
-always checks the right things in the right order.
-
-**Writing skills** — draft a new section in your house style (verbose, step-by-step,
-with explicit justifications) and append it to the main document. If you always want
-sections to have the same structure and level of detail, a skill enforces that.
-
-### How to write a skill
-
-Skills live in `.claude/skills/` in your project directory, one file per skill.
-The file is a Markdown document. Claude reads it and follows it when you invoke
-the skill.
-
-A skill file has a simple structure:
-
-```markdown
-# skill-name
-
-One sentence describing what this skill does.
-
-## When to invoke
-Precise conditions: what state should the files be in, what is the input,
-what triggers you to run this rather than something else.
-
-## Input
-What arguments the user can pass: /skill-name condensed.tex, or /skill-name §3, etc.
-
-## Steps
-1. Concrete step.
-2. Concrete step, referencing specific tools or commands.
-3. Include error handling: what to do if step 2 fails.
-
-## Output format
-What Claude tells you when done. A standard format helps you scan results
-quickly across many sessions.
-```
-
-The key is specificity. Vague skills ("do analysis") produce vague results.
-Specific skills ("run pdflatex twice, check for error lines starting with `!`,
-fix undefined control sequences by checking the preamble macros, report page count
-and overfull box count > 5pt") produce consistent, reliable results.
-
-### Ready-made skills from Anthropic
-
-You do not need to write every skill from scratch. Anthropic maintains a public
-[skills repository](https://github.com/anthropics/skills) with skills for common
-tasks. The most useful one for researchers is the **pdf skill**.
-
-**The pdf skill** handles everything you might want to do with a PDF file: extract
-text or tables, merge or split documents, add watermarks, OCR a scanned PDF, or
-create a new PDF programmatically. Drop the skill file into `.claude/skills/` and
-invoke it with `/pdf` (or whatever name you give the file).
-
-Install it:
-```bash
-# Download directly:
-curl -o .claude/skills/pdf.md \
-  https://raw.githubusercontent.com/anthropics/skills/main/skills/pdf/SKILL.md
-```
-
-For researchers, this is most useful when you have reference PDFs you want to
-extract specific sections from, or when you want Claude to process a scanned
-document before working with its content. Without the skill, Claude handles
-PDFs less consistently and you have to re-explain the approach each time.
-
-### When to write a skill vs not
-
-**Write a skill when:**
-- You will do this procedure more than twice
-- The procedure has a checklist or a defined done-condition
-- The procedure involves a judgment (e.g., which changes are "load-bearing") that
-  you want to codify consistently
-- The order of steps matters and is non-obvious
-- You want the result reported in a standard format every time
-
-**Do not write a skill when:**
-- You only need to do this once (just give the instruction in chat)
-- The procedure genuinely varies each time
-- The task is simple enough to state in one sentence
-
-### Example: the latex-compile skill
-
-Here is a complete, working skill from this repository:
-
-```markdown
-# latex-compile
-
-Compile a LaTeX document, fix errors and overfull hboxes, and report the result.
-
-## When to invoke
-After any edit to a .tex file. Also invoke before committing.
-
-## Input
-The user may specify a file: `/latex-compile condensed.tex`. Default: main.tex.
-
-## Steps
-
-1. Run `pdflatex -interaction=nonstopmode -halt-on-error <file>` twice.
-   (Second pass resolves cross-references and TOC entries.)
-
-2. Check the output for:
-   - Fatal errors (lines starting with `!`):
-     - "Undefined control sequence": check macro definitions in preamble.
-     - "Missing {": usually a fragile macro in a section title;
-       use \DeclareRobustCommand instead of \newcommand.
-     - "Missing $": stray character in math mode.
-   - Undefined references (LaTeX Warning: Reference ... undefined):
-     report to user; do not fix (these are usually expected forward refs).
-   - Overfull hboxes > 5pt: fix by adding a line break at a natural word boundary,
-     switching inline math to display math, or adding \emergencystretch=3em.
-
-3. Report: page count, number of undefined references, number of overfull hboxes.
-
-## Output format
-Compiled <file>: N pages, M undefined refs, K overfull hboxes.
-[If errors fixed: fixed X / remaining Y (describe each remaining error)]
-```
-
-Short, specific, consistent output.
 
 ---
 
@@ -1050,6 +1011,363 @@ tool, not a loss. Use it.
 
 ---
 
+## Skills: reusable procedures
+
+### What skills are
+
+Skills are named, reusable instruction sets for Claude. You define a skill once by
+writing a Markdown file in `.claude/skills/`. After that, any time you type
+`/skill-name` in your Claude Code session, Claude executes that skill.
+
+Think of skills as macros or procedures: instead of explaining a multi-step process
+every time you need it, you write it once and invoke it by name. Claude reads the
+skill file and follows the instructions in it.
+
+Skills are different from CLAUDE.md instructions in an important way: CLAUDE.md
+is always active (Claude reads it every session). Skills are invoked on demand.
+Use CLAUDE.md for standing instructions about how to behave; use skills for
+specific procedures you want to run on demand.
+
+### Why skills are useful
+
+Without skills, you find yourself typing the same instructions over and over:
+"Compile main.tex, fix any errors, tell me the page count and any overfull boxes."
+With a skill, you type `/latex-compile` and Claude does exactly that procedure,
+exactly the same way, every time.
+
+For research, the most valuable skills are:
+
+**Compilation skills** — compile your document, catch a specific class of errors,
+report in a standard format. Without a skill, you either write these instructions
+every time or get inconsistent behavior.
+
+**Sync skills** — propagate changes between related documents (e.g., from your
+full paper to your condensed notes). The criteria for what to propagate are subtle;
+writing them once in a skill ensures consistent judgment across sessions.
+
+**Verification skills** — run a specific check against current results. For
+mathematical projects, this might be "verify that this formula gives the right
+residue at a specific point." Writing the check protocol in a skill means Claude
+always checks the right things in the right order.
+
+**Writing skills** — draft a new section in your house style (verbose, step-by-step,
+with explicit justifications) and append it to the main document. If you always want
+sections to have the same structure and level of detail, a skill enforces that.
+
+### How to write a skill
+
+Skills live in `.claude/skills/` in your project directory, one file per skill.
+The file is a Markdown document. Claude reads it and follows it when you invoke
+the skill.
+
+A skill file has a simple structure:
+
+```markdown
+# skill-name
+
+One sentence describing what this skill does.
+
+## When to invoke
+Precise conditions: what state should the files be in, what is the input,
+what triggers you to run this rather than something else.
+
+## Input
+What arguments the user can pass: /skill-name condensed.tex, or /skill-name §3, etc.
+
+## Steps
+1. Concrete step.
+2. Concrete step, referencing specific tools or commands.
+3. Include error handling: what to do if step 2 fails.
+
+## Output format
+What Claude tells you when done. A standard format helps you scan results
+quickly across many sessions.
+```
+
+The key is specificity. Vague skills ("do analysis") produce vague results.
+Specific skills ("run pdflatex twice, check for error lines starting with `!`,
+fix undefined control sequences by checking the preamble macros, report page count
+and overfull box count > 5pt") produce consistent, reliable results.
+
+### Ready-made skills from Anthropic
+
+You do not need to write every skill from scratch. Anthropic maintains a public
+[skills repository](https://github.com/anthropics/skills) with skills for common
+tasks. The most useful one for researchers is the **pdf skill**.
+
+**The pdf skill** handles everything you might want to do with a PDF file: extract
+text or tables, merge or split documents, add watermarks, OCR a scanned PDF, or
+create a new PDF programmatically. Drop the skill file into `.claude/skills/` and
+invoke it with `/pdf` (or whatever name you give the file).
+
+Install it:
+```bash
+# Download directly:
+curl -o .claude/skills/pdf.md \
+  https://raw.githubusercontent.com/anthropics/skills/main/skills/pdf/SKILL.md
+```
+
+For researchers, this is most useful when you have reference PDFs you want to
+extract specific sections from, or when you want Claude to process a scanned
+document before working with its content. Without the skill, Claude handles
+PDFs less consistently and you have to re-explain the approach each time.
+
+### When to write a skill vs not
+
+**Write a skill when:**
+- You will do this procedure more than twice
+- The procedure has a checklist or a defined done-condition
+- The procedure involves a judgment (e.g., which changes are "load-bearing") that
+  you want to codify consistently
+- The order of steps matters and is non-obvious
+- You want the result reported in a standard format every time
+
+**Do not write a skill when:**
+- You only need to do this once (just give the instruction in chat)
+- The procedure genuinely varies each time
+- The task is simple enough to state in one sentence
+
+### Example: the latex-compile skill
+
+Here is a complete, working skill from this repository:
+
+```markdown
+# latex-compile
+
+Compile a LaTeX document, fix errors and overfull hboxes, and report the result.
+
+## When to invoke
+After any edit to a .tex file. Also invoke before committing.
+
+## Input
+The user may specify a file: `/latex-compile condensed.tex`. Default: main.tex.
+
+## Steps
+
+1. Run `pdflatex -interaction=nonstopmode -halt-on-error <file>` twice.
+   (Second pass resolves cross-references and TOC entries.)
+
+2. Check the output for:
+   - Fatal errors (lines starting with `!`):
+     - "Undefined control sequence": check macro definitions in preamble.
+     - "Missing {": usually a fragile macro in a section title;
+       use \DeclareRobustCommand instead of \newcommand.
+     - "Missing $": stray character in math mode.
+   - Undefined references (LaTeX Warning: Reference ... undefined):
+     report to user; do not fix (these are usually expected forward refs).
+   - Overfull hboxes > 5pt: fix by adding a line break at a natural word boundary,
+     switching inline math to display math, or adding \emergencystretch=3em.
+
+3. Report: page count, number of undefined references, number of overfull hboxes.
+
+## Output format
+Compiled <file>: N pages, M undefined refs, K overfull hboxes.
+[If errors fixed: fixed X / remaining Y (describe each remaining error)]
+```
+
+Short, specific, consistent output.
+
+---
+
+## Git workflow for academics
+
+Many physicists avoid version control because git has a reputation for being
+painful to learn. Claude Code largely removes that barrier: you do not need to
+know git commands. You say "commit the current state" or "push to GitHub" and
+Claude handles it. What you do need to do is tell Claude your setup once, in
+CLAUDE.md.
+
+### Why version control matters when working with Claude
+
+When Claude is editing files — restructuring a LaTeX section, propagating a
+formula change, rewriting a computation script — mistakes can happen. With git,
+recovery is a one-sentence instruction: "revert to the last commit." Without it,
+recovery means working backwards through chat history hoping nothing was overwritten.
+
+Commit at natural checkpoints: after a LaTeX section compiles clean, after a
+numerical result is validated, before a major restructure. You do not need to
+write commit messages yourself; Claude will write them based on what it just did.
+
+### Dual-remote setup for academics
+
+Many researchers have a personal GitHub for public work and an institution GitLab
+for work under their affiliation. Tell Claude both remotes in CLAUDE.md:
+
+```
+## Git
+- Remote 'github': https://github.com/YOUR_USER/YOUR_REPO.git (primary)
+- Remote 'gitlab': git@git.YOUR_INSTITUTION.ac.uk:YOUR_ID/YOUR_REPO.git (institution)
+- Push: git push github main
+- Commit author: YOUR_NAME <your-email>
+- No Co-Authored-By trailers in commits.
+```
+
+The [`scripts/git-push-both.sh`](scripts/git-push-both.sh) script handles pushing
+to both remotes, and the PostToolUse hook in the starter settings fires it
+automatically after every push to GitHub. You can also ask Claude to keep an
+experimental branch on only one remote until you are ready to publish it — just
+tell it which remote to use.
+
+---
+
+## Numerics and computation
+
+### Choose a primary engine and commit to it
+
+For a long research project, use one computation engine as the primary and one
+as an independent cross-check. Do not mix them casually.
+
+**Recommended primary engine: Python + mpmath.**
+
+mpmath is a Python library for arbitrary-precision arithmetic. It supports:
+- Arithmetic to any precision (`mp.dps = 50` for 50 decimal places)
+- Special functions (Gamma, zeta, Bessel, Hurwitz zeta, polylogarithm, and more)
+- Numerical integration and summation
+- Root-finding, differentiation
+
+It is free, open source, and reproducible. Results can be committed alongside
+the scripts that produced them. The precision can be increased if a result is
+ambiguous at the default level.
+
+**When to use Mathematica:** for symbolic computation and independent cross-checks.
+Mathematica's symbolic engine is more powerful than mpmath's. Use it to verify
+a formula symbolically (e.g., check a simplification, verify a functional equation).
+Note that Mathematica output is hard to put in version control and hard to reproduce
+exactly across different versions.
+
+`wolframscript` runs Mathematica headlessly from the command line and can be invoked
+from a shell script or Claude session — the recommended interface if you have Mathematica.
+
+### Wolfbook: Mathematica notebooks in VS Code
+
+If you use Mathematica, [Wolfbook](https://wolfbook.app/) is the right way to work
+with it in this workflow. It is a free, open-source VS Code extension that runs
+Wolfram Language notebooks directly inside VS Code — cell-by-cell evaluation,
+LaTeX-rendered output, and inline graphics, connected to your local Mathematica
+kernel. Install from the
+[VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=vanbaalon.wolfbook)
+or from [github.com/vanbaalon/wolfbook](https://github.com/vanbaalon/wolfbook).
+
+Wolfram's own VS Code extension is significantly worse. The Mathematica desktop
+application requires an expensive licence for every machine you use and does not
+integrate with your git workflow or with Claude. Wolfbook is free; only the
+Mathematica kernel licence costs anything.
+
+**File format: .wb, not .nb.** Wolfbook uses its own `.wb` format — plain text,
+Git-diffable, and directly readable by Claude. This matters: Claude can open a
+`.wb` notebook, understand what computations you ran and what results came out,
+and help you debug or extend them without any special handling. Mathematica's
+native `.nb` format is a proprietary binary that Claude cannot read and that does
+not version-control cleanly. For a research project where you want Claude to
+understand your symbolic computations, `.wb` is the right format.
+
+**For new work:** start in `.wb` from the beginning. The workflow is the same as
+a Mathematica notebook — you write cells, evaluate them, see output inline.
+
+**For existing `.nb` notebooks and `.m` scripts:** use the `/nb-to-wolfbook` skill
+included in the starter package. Run `/nb-to-wolfbook <file>` (or point it at a
+directory to convert everything at once). The skill tries wolframscript first — if
+that is available it exports the notebook content directly; otherwise it falls back
+to [mathematica2jupyter](https://github.com/divenex/mathematica2jupyter). Output
+cells (computed results) are not preserved in the conversion — re-run the cells
+after opening the `.wb` file in VS Code. Graphics-heavy notebooks may need minor
+manual cleanup. Convert once, then work in `.wb` going forward.
+
+**Plain `.m` script files** (not notebooks) work well for computation scripts that
+Claude runs or modifies. Claude reads and edits `.m` files the same as Python
+scripts — no special handling needed.
+
+### Precision discipline
+
+Always state the precision explicitly:
+- In the computation script: `mp.dps = 30` at the top
+- In CLAUDE.md: "Precision: mp.dps = 30 unless stated otherwise"
+- In the paper write-up: "computed to 30 decimal places"
+
+A result is not validated until you have confirmed it at two different precision
+levels or by two independent methods. "It came out correctly at 15 digits" is not
+a validation. "It came out correctly at 15 digits by method A and at 12 digits by
+method B" is.
+
+### Build validation into every script
+
+Every numerical result should have a validation before you treat it as established:
+- A known special case (does the formula give the right answer at a value you
+  can check analytically?)
+- A symmetry check (if the result should be symmetric under some operation, is it?)
+- An independent computation (same result by a different method or script)
+- A residue check (if the function should have a pole of known residue, does the
+  numerical extraction match?)
+
+Ask Claude to build the validation into the script, not as an afterthought.
+A script that computes a result and separately validates it is worth twice a script
+that only computes.
+
+### The run log
+
+For computations that take more than a few seconds, route output to a log file:
+
+```python
+import sys
+log = open("numerics/run.log", "w")
+print(f"M_3 = {result}", file=log, flush=True)
+```
+
+Watch it from your editor or terminal: `tail -f numerics/run.log`. This lets
+you monitor progress without blocking your editor and gives Claude a way to see
+what a long computation is doing.
+
+### Mark AI-generated outputs separately
+
+In data-science projects, a common convention is a dedicated `data/generated/`
+folder to separate AI-produced outputs from human-processed data. The same
+principle applies to a LaTeX research project — just in a different form.
+
+**Why it matters:** Claude can produce a plot, a table, or a numerical output that
+looks exactly like something you computed yourself. Months later you cannot tell
+which results came from your own scripts and which came from a Claude session that
+ran something quickly and never saved the script properly. This is a reproducibility
+problem: if the result is not traceable to a committed script, it cannot be
+verified or reproduced.
+
+**Convention for LaTeX projects:**
+
+```
+numerics/
+  ├── residue_check.py         ← your scripts (committed, reviewed)
+  ├── run.log
+  └── generated/               ← Claude-produced outputs pending your review
+      ├── table_residues.tex
+      └── plot_spectral.pdf
+
+figures/
+  ├── diagram_unfolding.pdf    ← figures you made
+  └── generated/               ← Claude-produced figures pending your review
+      └── spectral_plot.pdf
+```
+
+Everything in `generated/` is provisional. Before a result moves out of
+`generated/` and into the main directory, you have reviewed it, traced it to a
+committed script, and confirmed it is correct. Nothing in `generated/` should
+appear in the paper directly — it is a staging area, not a source of truth.
+
+Add this to your CLAUDE.md:
+
+```
+## AI-generated outputs
+All plots, tables, and numerical outputs Claude produces go in numerics/generated/
+or figures/generated/ until I have reviewed them and traced them to a committed
+script. Never include generated/ outputs in main.tex without my explicit instruction.
+```
+
+---
+
+# Part III: Power tools
+
+*Optional machinery: automation hooks, token savings, and publishing your work.
+None of this is required to be productive. Adopt it once the basics feel
+comfortable and you want to remove friction.*
+
 ## Settings and hooks
 
 ### Overview
@@ -1212,47 +1530,6 @@ difference is significant.
 
 ---
 
-## Git workflow for academics
-
-Many physicists avoid version control because git has a reputation for being
-painful to learn. Claude Code largely removes that barrier: you do not need to
-know git commands. You say "commit the current state" or "push to GitHub" and
-Claude handles it. What you do need to do is tell Claude your setup once, in
-CLAUDE.md.
-
-### Why version control matters when working with Claude
-
-When Claude is editing files — restructuring a LaTeX section, propagating a
-formula change, rewriting a computation script — mistakes can happen. With git,
-recovery is a one-sentence instruction: "revert to the last commit." Without it,
-recovery means working backwards through chat history hoping nothing was overwritten.
-
-Commit at natural checkpoints: after a LaTeX section compiles clean, after a
-numerical result is validated, before a major restructure. You do not need to
-write commit messages yourself; Claude will write them based on what it just did.
-
-### Dual-remote setup for academics
-
-Many researchers have a personal GitHub for public work and an institution GitLab
-for work under their affiliation. Tell Claude both remotes in CLAUDE.md:
-
-```
-## Git
-- Remote 'github': https://github.com/YOUR_USER/YOUR_REPO.git (primary)
-- Remote 'gitlab': git@git.YOUR_INSTITUTION.ac.uk:YOUR_ID/YOUR_REPO.git (institution)
-- Push: git push github main
-- Commit author: YOUR_NAME <your-email>
-- No Co-Authored-By trailers in commits.
-```
-
-The [`scripts/git-push-both.sh`](scripts/git-push-both.sh) script handles pushing
-to both remotes, and the PostToolUse hook in the starter settings fires it
-automatically after every push to GitHub. You can also ask Claude to keep an
-experimental branch on only one remote until you are ready to publish it — just
-tell it which remote to use.
-
----
-
 ## GitHub README and LaTeX
 
 If your repository is public and contains mathematical content, you will want
@@ -1305,114 +1582,10 @@ before you push.
 
 ---
 
-## Numerics and computation
+# Part IV: What Claude gets wrong
 
-### Choose a primary engine and commit to it
-
-For a long research project, use one computation engine as the primary and one
-as an independent cross-check. Do not mix them casually.
-
-**Recommended primary engine: Python + mpmath.**
-
-mpmath is a Python library for arbitrary-precision arithmetic. It supports:
-- Arithmetic to any precision (`mp.dps = 50` for 50 decimal places)
-- Special functions (Gamma, zeta, Bessel, Hurwitz zeta, polylogarithm, and more)
-- Numerical integration and summation
-- Root-finding, differentiation
-
-It is free, open source, and reproducible. Results can be committed alongside
-the scripts that produced them. The precision can be increased if a result is
-ambiguous at the default level.
-
-**When to use Mathematica:** for symbolic computation and independent cross-checks.
-Mathematica's symbolic engine is more powerful than mpmath's. Use it to verify
-a formula symbolically (e.g., check a simplification, verify a functional equation).
-Note that Mathematica output is hard to put in version control and hard to reproduce
-exactly across different versions.
-
-`wolframscript` runs Mathematica headlessly from the command line and can be invoked
-from a shell script or Claude session — the recommended interface if you have Mathematica.
-
-### Wolfbook: Mathematica notebooks in VS Code
-
-If you use Mathematica, [Wolfbook](https://wolfbook.app/) is the right way to work
-with it in this workflow. It is a free, open-source VS Code extension that runs
-Wolfram Language notebooks directly inside VS Code — cell-by-cell evaluation,
-LaTeX-rendered output, and inline graphics, connected to your local Mathematica
-kernel. Install from the
-[VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=vanbaalon.wolfbook)
-or from [github.com/vanbaalon/wolfbook](https://github.com/vanbaalon/wolfbook).
-
-Wolfram's own VS Code extension is significantly worse. The Mathematica desktop
-application requires an expensive licence for every machine you use and does not
-integrate with your git workflow or with Claude. Wolfbook is free; only the
-Mathematica kernel licence costs anything.
-
-**File format: .wb, not .nb.** Wolfbook uses its own `.wb` format — plain text,
-Git-diffable, and directly readable by Claude. This matters: Claude can open a
-`.wb` notebook, understand what computations you ran and what results came out,
-and help you debug or extend them without any special handling. Mathematica's
-native `.nb` format is a proprietary binary that Claude cannot read and that does
-not version-control cleanly. For a research project where you want Claude to
-understand your symbolic computations, `.wb` is the right format.
-
-**For new work:** start in `.wb` from the beginning. The workflow is the same as
-a Mathematica notebook — you write cells, evaluate them, see output inline.
-
-**For existing `.nb` notebooks and `.m` scripts:** use the `/nb-to-wolfbook` skill
-included in the starter package. Run `/nb-to-wolfbook <file>` (or point it at a
-directory to convert everything at once). The skill tries wolframscript first — if
-that is available it exports the notebook content directly; otherwise it falls back
-to [mathematica2jupyter](https://github.com/divenex/mathematica2jupyter). Output
-cells (computed results) are not preserved in the conversion — re-run the cells
-after opening the `.wb` file in VS Code. Graphics-heavy notebooks may need minor
-manual cleanup. Convert once, then work in `.wb` going forward.
-
-**Plain `.m` script files** (not notebooks) work well for computation scripts that
-Claude runs or modifies. Claude reads and edits `.m` files the same as Python
-scripts — no special handling needed.
-
-### Precision discipline
-
-Always state the precision explicitly:
-- In the computation script: `mp.dps = 30` at the top
-- In CLAUDE.md: "Precision: mp.dps = 30 unless stated otherwise"
-- In the paper write-up: "computed to 30 decimal places"
-
-A result is not validated until you have confirmed it at two different precision
-levels or by two independent methods. "It came out correctly at 15 digits" is not
-a validation. "It came out correctly at 15 digits by method A and at 12 digits by
-method B" is.
-
-### Build validation into every script
-
-Every numerical result should have a validation before you treat it as established:
-- A known special case (does the formula give the right answer at a value you
-  can check analytically?)
-- A symmetry check (if the result should be symmetric under some operation, is it?)
-- An independent computation (same result by a different method or script)
-- A residue check (if the function should have a pole of known residue, does the
-  numerical extraction match?)
-
-Ask Claude to build the validation into the script, not as an afterthought.
-A script that computes a result and separately validates it is worth twice a script
-that only computes.
-
-### The run log
-
-For computations that take more than a few seconds, route output to a log file:
-
-```python
-import sys
-log = open("numerics/run.log", "w")
-print(f"M_3 = {result}", file=log, flush=True)
-```
-
-Watch it from your editor or terminal: `tail -f numerics/run.log`. This lets
-you monitor progress without blocking your editor and gives Claude a way to see
-what a long computation is doing.
-
----
+*Required reading, whatever your experience level. None of these failure modes
+are edge cases — a months-long project will hit all of them.*
 
 ## Honest limitations
 
@@ -1468,7 +1641,112 @@ mathematically sound?", "is this contribution novel?" require human judgment fro
 someone who understands your field. Claude will answer these questions fluently,
 but you should not rely on those answers.
 
+### Claude fabricates citations
+
+Claude will invent references with the same confidence it cites real ones. It does
+not retrieve papers from a database — it generates plausible-sounding titles,
+authors, and journal names from patterns in its training data. The output looks
+like a real citation. The paper often does not exist.
+
+The hardest failure to catch is "vibe citing" (a term from
+[Imbad0202/academic-research-skills](https://github.com/Imbad0202/academic-research-skills)):
+Claude mixes elements from two or three real papers — a real author, a real journal,
+a plausible title — into a single fabricated reference. Each component sounds
+familiar; the combination is fictitious. This is harder to detect than a purely
+invented citation.
+
+**The rule:** treat every citation Claude produces as unverified until you have
+checked it yourself. The check takes 30 seconds: search [Semantic Scholar](https://www.semanticscholar.org),
+[OpenAlex](https://openalex.org), or [arXiv](https://arxiv.org) for the exact
+title and author. Do not soften this rule because the citation "looks right."
+
+A practical instruction to add to your CLAUDE.md:
+
+```
+Never write a citation into any file without telling me you are about to do so.
+If you cannot find the paper on Semantic Scholar, arXiv, or OpenAlex, say so
+explicitly — do not invent a plausible reference.
+```
+
+The [`/verify-citation`](#skills-reusable-procedures) skill in the starter package
+automates this check: it searches for the paper before writing the citation and
+blocks if it cannot confirm the reference exists.
+
+### Claude agrees when it should not
+
+Claude is trained to be helpful, and helpfulness creates a failure mode that
+matters specifically in research: when you push back — "are you sure?", "that
+doesn't look right" — Claude will often revise its answer toward yours, even if
+its original answer was correct.
+
+In mathematical research this is dangerous. Claude derives a residue; you think
+the sign is wrong and say so; Claude agrees and corrects itself. Later you find
+the original sign was right. The problem is not that Claude made an error — it
+is that Claude changed a correct answer because you expressed doubt.
+
+A related failure: Claude makes a commitment without following through. It says
+"I'll note that in CLAUDE.md" or "I've recorded that" without actually calling
+any write tool. The [promise-checker hook](#settings-and-hooks) in the starter
+settings catches this automatically: if the last Claude turn contains a phrase
+like "I've saved that" or "I'll remember" and no file was written, it prompts
+Claude to actually do it.
+
+**The rule for contested calculations:** if Claude changes its answer after you
+express doubt, open a new session and ask the same question in isolation, without
+the prior exchange visible. If the fresh answer matches the original, the first
+answer was almost certainly right. Use the [`/reality-check`](#skills-reusable-procedures)
+skill to structure this cleanly.
+
+Add this instruction to your CLAUDE.md:
+
+```
+If you change your answer because I expressed doubt or disagreement, say so
+explicitly: "I am revising my earlier answer because you pushed back." Do not
+quietly update without flagging the change.
+```
+
+This does not prevent sycophancy entirely, but it makes the failures visible.
+
+### Validate physics claims with a second model
+
+Claude has specific, documented weak spots in physics that are distinct from
+general-purpose errors:
+
+- **Dimensional analysis**: Claude checks dimensions inconsistently and sometimes
+  skips the check entirely while asserting the result is dimensionally correct.
+- **Formula provenance**: it will write down a formula from memory without a
+  source and be wrong about the sign convention, the normalisation, or both.
+- **Plausible-but-wrong interpretations**: it constructs arguments that look like
+  physics reasoning but break down when you trace them carefully.
+
+These failure modes are largely independent across different AI models. A formula
+Claude gets wrong tends not to be wrong in the same way that Gemini or ChatGPT
+get it wrong (a property called "hallucination orthogonality" in
+[flonat/claude-research](https://github.com/flonat/claude-research)). This means
+cross-model validation is an effective check: ask the same question to a second
+model and compare the answers.
+
+**Practical workflow:**
+
+1. Get Claude's result and note any quantities with dimensions, sign choices, or
+   formulas cited from memory.
+2. Ask the same question to Gemini or ChatGPT. Do not show it Claude's answer.
+3. If the answers agree: high confidence. If they disagree: one of them is wrong,
+   and you need to go back to the source. This is almost always faster than
+   debugging the derivation from scratch.
+
+The [`/cross-validate`](#skills-reusable-procedures) skill formats a claim for
+this check and lists what specifically to look for when comparing the two answers.
+
+For a free, scriptable version of this: the [Gemini CLI](https://github.com/google-gemini/gemini-cli)
+can be called from the terminal (`gemini -p "..."`), which makes it possible to
+run both models on the same question from a single session.
+
 ---
+
+# Appendix
+
+*Everything in this repo that you can copy directly into your own project.*
 
 ## Templates and scripts in this repo
 
@@ -1484,18 +1762,22 @@ starter/
 └── .claude/
     ├── settings.json                ← permissions + hooks
     ├── hooks/
-    │   └── pre-compact.sh           ← auto-save before context compression
+    │   ├── pre-compact.sh           ← auto-save before context compression
+    │   └── promise-checker.sh       ← Stop hook: catches "I'll remember" without a write
     └── skills/
         ├── latex-compile.md         ← /latex-compile skill
         ├── sync-condensed.md        ← /sync-condensed skill
-        └── nb-to-wolfbook.md        ← /nb-to-wolfbook skill
+        ├── nb-to-wolfbook.md        ← /nb-to-wolfbook skill
+        ├── verify-citation.md       ← /verify-citation skill
+        ├── reality-check.md         ← /reality-check skill
+        └── cross-validate.md        ← /cross-validate skill
 ```
 
 Copy the files, fill in `CLAUDE.md` with your project's details, and you are ready
 to start your first session. If you would rather have Claude fill in CLAUDE.md from
 a description you give it, see
 [Bootstrapping a new project with Claude](#bootstrapping-a-new-project-with-claude)
-below.
+in Part I.
 
 ### Individual files
 
@@ -1503,78 +1785,20 @@ below.
 |------|------------|
 | [`starter/CLAUDE.md`](starter/CLAUDE.md) | Starting CLAUDE.md for any research project, with all sections and explanatory comments |
 | [`starter/next-session-prompts.md`](starter/next-session-prompts.md) | Session log template with format examples |
-| [`starter/.claude/settings.json`](starter/.claude/settings.json) | Annotated generic settings: permissions for research tools + hooks for pre-compact and dual-remote push |
+| [`starter/.claude/settings.json`](starter/.claude/settings.json) | Annotated generic settings: permissions for research tools + hooks for pre-compact, dual-remote push, and promise-checker |
 | [`starter/.claude/hooks/pre-compact.sh`](starter/.claude/hooks/pre-compact.sh) | Pre-compact hook: timestamps CLAUDE.md and snapshots the task log before context compression |
 | [`starter/.claude/skills/latex-compile.md`](starter/.claude/skills/latex-compile.md) | Skill: compile LaTeX, fix common errors, report result |
 | [`starter/.claude/skills/sync-condensed.md`](starter/.claude/skills/sync-condensed.md) | Skill: propagate load-bearing changes from main document to condensed notes |
 | [`starter/.claude/skills/nb-to-wolfbook.md`](starter/.claude/skills/nb-to-wolfbook.md) | Skill: convert .nb notebooks and .m scripts to Wolfbook's .wb format |
+| [`starter/.claude/skills/verify-citation.md`](starter/.claude/skills/verify-citation.md) | Skill: verify a paper exists on Semantic Scholar / arXiv before writing it as a citation |
+| [`starter/.claude/skills/reality-check.md`](starter/.claude/skills/reality-check.md) | Skill: re-derive a contested result in isolation to detect sycophantic capitulation |
+| [`starter/.claude/skills/cross-validate.md`](starter/.claude/skills/cross-validate.md) | Skill: format a physics claim for cross-model validation against Gemini or ChatGPT |
+| [`starter/.claude/hooks/promise-checker.sh`](starter/.claude/hooks/promise-checker.sh) | Stop hook: catches "I'll remember / I've saved" without a corresponding file write |
 | [`examples/CLAUDE-template.md`](examples/CLAUDE-template.md) | Heavily commented CLAUDE.md template with all sections; use as the base when filling in manually |
 | [`examples/next-session-prompts-template.md`](examples/next-session-prompts-template.md) | Session log template with worked examples of well-written task descriptions |
 | [`examples/condensed-notes-guide.md`](examples/condensed-notes-guide.md) | Detailed guide on what to include and exclude from the condensed notes document |
 | [`scripts/git-push-both.sh`](scripts/git-push-both.sh) | Dual-remote push: push to GitHub (personal) and GitLab (institution) with separate identities |
 | [`scripts/readme-latex-check.sh`](scripts/readme-latex-check.sh) | Scan a README for LaTeX commands that GitHub's MathJax does not support |
-
-### Bootstrapping a new project with Claude
-
-The fastest path from nothing to a fully configured research project is to let
-Claude do the setup for you — once. Here is how.
-
-**Step 1 — Gather your materials.** Create a folder for the project. Put in it
-whatever you have: a LaTeX draft, reference PDFs, computation scripts, handwritten
-notes scanned to PDF, a plain-text outline. It does not matter how raw the state is.
-
-**Step 2 — Open the folder in VS Code and start a Claude Code session.**
-
-**Step 3 — Describe the project.** In your first message, tell Claude everything
-it would need to know. Cover:
-- What the project is and what mathematical or scientific object you are studying
-- The open question you are working toward
-- The files you added and what each one is for
-- The notation and conventions you use (including sign and normalisation choices)
-- Your preferences: how detailed should LaTeX write-ups be, what is your git remote
-  setup, do you use Mathematica or Python for numerics, etc.
-- Anything else you would put in a CLAUDE.md if you were writing it by hand
-
-Do not worry about structure. Write it conversationally. The more you say, the
-better the generated CLAUDE.md will be.
-
-**Step 4 — Ask Claude to initialise the project.** Paste this prompt after your
-description:
-
-> I want to set up this project using the workflow at
-> https://github.com/Mexregkan/claude-for-researchers/. Please:
-> 1. Create `CLAUDE.md` populated with the project details I just described,
->    using `examples/CLAUDE-template.md` from that repo as the template.
-> 2. Create `.claude/settings.json` (use the starter package version from that repo).
-> 3. Create `.claude/hooks/pre-compact.sh` (use the starter package version).
-> 4. Create `.claude/skills/` with the `latex-compile`, `sync-condensed`, and `nb-to-wolfbook` skills.
-> 5. Install rtk if not already installed (`brew install rtk && rtk init -g --auto-patch`).
-> 6. Install the Anthropic pdf skill (`curl` it into `.claude/skills/pdf.md`).
-> 7. Install the Wolfbook VS Code extension (`code --install-extension vanbaalon.wolfbook`).
-> 8. Initialise a git repo if one does not exist.
->
-> Fill in `CLAUDE.md`'s Conventions, File map, and Current status sections from what
-> I told you about the project.
-
-Claude will read the guide, download the starter files, install the tools, create
-the directory structure, and write a CLAUDE.md populated with your project's details.
-The whole thing takes a few minutes.
-
-**Step 5 — Review what Claude produced.** Read through the generated `CLAUDE.md`
-carefully. The structure, hooks, and settings will be correct by construction. The
-parts that need your attention are the domain-specific sections — Conventions and
-Current status — because those require your knowledge to get right. Correct anything
-Claude misunderstood about your project, and you are ready to begin.
-
-**If you have existing Mathematica notebooks or scripts**, run `/nb-to-wolfbook` on
-them after setup is complete. Point it at a file or a whole directory and it will
-convert everything to Wolfbook's `.wb` format in one step — re-run the cells
-afterwards to regenerate output.
-
-This works because Claude Code can read a GitHub repository, run shell commands, and
-create files, and because the guide it is reading contains explicit templates and
-instructions it can follow directly. The setup task is exactly the kind of structured,
-mechanical work Claude does reliably. The research that follows is yours.
 
 ---
 

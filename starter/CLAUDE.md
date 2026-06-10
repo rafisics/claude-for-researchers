@@ -56,6 +56,28 @@ render in Claude Code's chat window. Write math in plain Unicode:
   multi-char sub/superscripts: M_{ab}, e^{-π t}, τ^{-2}
 LaTeX belongs ONLY inside .tex files.
 
+## Citations (NON-NEGOTIABLE)
+<!-- Prevents fabricated references. Claude invents citations with full confidence. -->
+
+Never write a citation into any file without first verifying the paper exists on
+Semantic Scholar, arXiv, or OpenAlex. Use `/verify-citation` before adding any
+reference. If you cannot confirm the paper exists, say so explicitly — do not
+invent a plausible alternative.
+
+## Anti-sycophancy rule (IMPORTANT)
+<!-- Makes capitulation visible. Claude will agree when it should not. -->
+
+If you change your answer because I expressed doubt or disagreement, say so
+explicitly: "I am revising my earlier answer because you pushed back."
+Do not silently update a formula or sign without flagging the change.
+
+## AI-generated outputs
+<!-- Separates what you computed from what Claude computed. -->
+
+All plots, tables, and numerical outputs you produce go in `numerics/generated/`
+or `figures/generated/` until I have reviewed them and traced them to a committed
+script. Never include `generated/` content in main.tex without my explicit instruction.
+
 ## Skills
 <!-- List skills defined in .claude/skills/ and when to invoke them. -->
 
@@ -65,6 +87,9 @@ LaTeX belongs ONLY inside .tex files.
   Use after establishing a new result.
 - `/nb-to-wolfbook` — convert .nb notebooks or .m scripts to Wolfbook's .wb format.
   Use when migrating existing Mathematica files to work in VS Code with Wolfbook.
+- `/verify-citation` — verify a paper exists before writing it as a citation.
+- `/reality-check` — re-derive a contested result in isolation to detect sycophancy.
+- `/cross-validate` — format a physics claim for cross-model validation.
 
 ## Writing style in main.tex (IMPORTANT)
 <!-- Tell Claude how detailed to be when writing in your main document.
