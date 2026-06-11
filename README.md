@@ -1108,9 +1108,21 @@ sections to have the same structure and level of detail, a skill enforces that.
 
 ### How to write a skill
 
-Skills live in `.claude/skills/` in your project directory, one file per skill.
-The file is a Markdown document. Claude reads it and follows it when you invoke
-the skill.
+Skills live in `.claude/skills/` in your project directory. There are two formats:
+
+```
+.claude/skills/latex-compile.md          ← flat: one file, self-contained
+.claude/skills/github-readme-math/       ← subfolder: skill + companion files
+                    SKILL.md
+                    render-math.js
+```
+
+Use the **flat format** (a single `.md` file) for almost every research skill —
+it is simpler and all the instructions fit in one place. Use the **subfolder format**
+only when a skill genuinely needs companion files alongside it: a helper script,
+a reference document too long to embed, or a template file. If there is only a
+`SKILL.md` inside the folder and nothing else, that is the flat format with
+unnecessary nesting — use the flat file instead.
 
 There is also a **global** location — `~/.claude/skills/` — for skills you want
 available in every project without copying them. See
