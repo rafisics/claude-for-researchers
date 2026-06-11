@@ -1112,6 +1112,10 @@ Skills live in `.claude/skills/` in your project directory, one file per skill.
 The file is a Markdown document. Claude reads it and follows it when you invoke
 the skill.
 
+There is also a **global** location — `~/.claude/skills/` — for skills you want
+available in every project without copying them. See
+[Global skills](#global-skills-one-skill-every-project) below.
+
 A skill file has a simple structure:
 
 ```markdown
@@ -1164,6 +1168,39 @@ extract specific sections from, or when you want Claude to process a scanned
 document before working with its content. Without the skill, Claude handles
 PDFs less consistently and you have to re-explain the approach each time.
 
+### Global skills: one skill, every project
+
+Project skills (`.claude/skills/`) only work in the project they live in. If you
+have a skill you use everywhere — like `/latex-compile` or `/pdf` — you would
+otherwise have to copy the file into every new project by hand.
+
+There is a better way: put the skill in `~/.claude/skills/`. Claude Code loads
+that directory on startup regardless of which project you are in. A skill placed
+there is immediately available in every project, with no setup.
+
+```bash
+# Copy an existing project skill to global:
+cp .claude/skills/latex-compile.md ~/.claude/skills/
+
+# Or write a new global skill directly:
+# create ~/.claude/skills/my-skill.md
+```
+
+The skill works exactly the same way — you invoke it with `/latex-compile` as
+usual, Claude reads the file from `~/.claude/skills/`, and it executes. The only
+difference is where the file lives.
+
+**When to make a skill global vs project-local:**
+
+- **Global** — the skill is generic and project-independent (compiling LaTeX,
+  processing PDFs, formatting citations). You want it everywhere.
+- **Project-local** — the skill references project-specific paths, macros, or
+  conventions (e.g., `/sync-brief` that knows about your specific `workbook.tex`
+  and `brief.tex` structure). Keep it in the project.
+
+If a skill starts life as project-local and you later find yourself copying it
+into every new project, that is the signal to move it to `~/.claude/skills/`.
+
 ### When to write a skill vs not
 
 **Write a skill when:**
@@ -1181,43 +1218,31 @@ PDFs less consistently and you have to re-explain the approach each time.
 
 ### Example: the latex-compile skill
 
-Here is a complete, working skill from this repository:
+The `latex-compile` skill in `starter/.claude/skills/` is a complete working
+example. It is also a good illustration of how specificity prevents entire classes
+of failure — writing a skill like this once is worth it.
 
-```markdown
-# latex-compile
+Three things this skill gets right that a naive version will not:
 
-Compile a LaTeX document, fix errors and overfull hboxes, and report the result.
-
-## When to invoke
-After any edit to a .tex file. Also invoke before committing.
-
-## Input
-The user may specify a file: `/latex-compile brief.tex`. Default: workbook.tex.
-
-## Steps
-
-1. Run `pdflatex -interaction=nonstopmode -halt-on-error <file>` twice.
-   (Second pass resolves cross-references and TOC entries.)
-
-2. Check the output for:
-   - Fatal errors (lines starting with `!`):
-     - "Undefined control sequence": check macro definitions in preamble.
-     - "Missing {": usually a fragile macro in a section title;
-       use \DeclareRobustCommand instead of \newcommand.
-     - "Missing $": stray character in math mode.
-   - Undefined references (LaTeX Warning: Reference ... undefined):
-     report to user; do not fix (these are usually expected forward refs).
-   - Overfull hboxes > 5pt: fix by adding a line break at a natural word boundary,
-     switching inline math to display math, or adding \emergencystretch=3em.
-
-3. Report: page count, number of undefined references, number of overfull hboxes.
-
-## Output format
-Compiled <file>: N pages, M undefined refs, K overfull hboxes.
-[If errors fixed: fixed X / remaining Y (describe each remaining error)]
+**Force a real compile pass.** `latexmk` skips recompilation when it thinks
+targets are already up-to-date. When that happens, the `.log` file it leaves
+behind is stale — it reflects the previous run, not the current one. The skill
+bypasses this by running `pdflatex` directly and capturing its stdout:
+```bash
+pdflatex -interaction=nonstopmode <file> > /tmp/tex.txt 2>&1
 ```
 
-Short, specific, consistent output.
+**Use `grep -a` everywhere.** pdflatex embeds binary font-path bytes in its
+output. Plain `grep` detects this and silently refuses to match anything — the
+warning grep returns an empty list, the skill reports "no issues", and the
+overfull boxes stay. Every grep in the skill uses `-a` to force text mode.
+
+**Severity thresholds and a hard content rule.** Not every overfull box is worth
+fixing. The skill triages by magnitude (> 10pt: fix; 5–10pt: fix if quick; < 5pt:
+leave), and it has a hard rule: **reformat, never reword**. Fix overflow by
+changing layout (promote inline math to display, wrap in `\sloppypar`, break a
+long equation), never by rewording math or abbreviating content. Without this rule,
+Claude reaches for the easiest fix — which is often a silent content change.
 
 ---
 
