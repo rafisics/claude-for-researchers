@@ -245,10 +245,19 @@ soften it.
 > **Copy these verbatim** — they are generic infrastructure and need no edits:
 > - `.claude/settings.json` (from `starter/.claude/settings.json`)
 > - `.claude/hooks/pre-compact.sh` and `.claude/hooks/promise-checker.sh`
-> - `.claude/skills/`: for each skill — `latex-compile`, `sync-brief`,
->   `nb-to-wolfbook`, `sync-wb-nb`, `verify-citation`, `reality-check`,
->   `cross-validate`, `overleaf-sync` — check `~/.claude/skills/<name>/SKILL.md`
->   first:
+> - `.gitignore` (from `starter/.gitignore`)
+>
+> **Install skills by relevance — NOT all of them.** The four generated files
+> below are universal; skills are not. From my project description, decide which
+> of these apply to this project:
+> - `latex-compile`, `sync-brief` — every project (they serve the core files)
+> - `verify-citation` — only if I will cite literature
+> - `reality-check`, `cross-validate` — if Claude will be doing derivations or
+>   calculations whose correctness matters (default: yes for research)
+> - `nb-to-wolfbook`, `sync-wb-nb` — only if I use Mathematica
+> - `overleaf-sync` — only if I mentioned a shared Overleaf project
+>
+> For each skill you selected, check `~/.claude/skills/<name>/SKILL.md` first:
 >   - **Exists globally and covers the same ground**: skip — the global skill is
 >     already available in every project, a local copy adds nothing.
 >   - **Exists globally but the starter version is meaningfully more complete**
@@ -257,10 +266,12 @@ soften it.
 >     key differences in one sentence so I can decide whether to update my global
 >     skill too.
 >   - **Does not exist globally**: copy from `starter/.claude/skills/<name>/SKILL.md`.
->   End with a one-line summary: which skills were found globally (skipped), which
->   were installed locally, and which were installed locally because the starter
->   version is better.
-> - `.gitignore` (from `starter/.gitignore`)
+>   End with a one-line summary in three groups: not relevant to this project
+>   (not installed), found globally (skipped), installed locally (and why).
+>
+> If the project runs numerics, also create the empty staging folders
+> `numerics/generated/` and `figures/generated/` — the CLAUDE.md you generate
+> below explains their role (AI-produced outputs pending my review).
 >
 > **Generate these from what I told you at the start of this session.** All four
 > files below must be customised to THIS project. Use the starter files ONLY for
@@ -296,7 +307,7 @@ soften it.
 > - `brew install rtk && rtk init -g --auto-patch`
 > - `mkdir -p ~/.claude/skills/pdf && curl -o ~/.claude/skills/pdf/SKILL.md https://raw.githubusercontent.com/anthropics/skills/main/skills/pdf/SKILL.md`
 >   (skip if `~/.claude/skills/pdf/SKILL.md` already exists)
-> - `code --install-extension wolfbook.wolfbook`
+> - `code --install-extension wolfbook.wolfbook` (only if I use Mathematica)
 > - `git init` (only if this is not already a git repo)
 
 **Step 5 — Approve the one-time install prompts.** Claude writes all the files
@@ -309,6 +320,31 @@ correct by construction. The parts that need your eyes are the domain-specific
 ones — Conventions, Current status, the introduction — because those depend on
 your knowledge. If Claude left anything generic or got a convention wrong, fix it
 now, and you are ready to begin.
+
+### Alternative: scripted setup
+
+If you prefer answering questions over pasting a prompt, `scripts/bootstrap.sh`
+does the same setup deterministically. Run it from your new project folder:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mexregkan/claude-for-researchers/main/scripts/bootstrap.sh | sh
+```
+
+It asks for the project title, author, numerics engine, and whether you cite
+literature, want the validation skills, or pair with a shared Overleaf project.
+It then installs the universal core — `CLAUDE.md` plus the workbook /
+brief / next-session-prompts trio, with your title and author already filled
+in — and **only the skills your answers make relevant**, skipping any skill
+already in your global `~/.claude/skills/`. It never overwrites an existing
+file, creates the `generated/` staging folders when you run numerics, and
+offers `git init`.
+
+The script handles *structure*; it cannot write your introduction or
+conventions. It finishes by printing the short prompt to paste into your first
+Claude session, which fills the remaining bracketed stubs from your project
+description. Both routes end in the same place — with the prompt, Claude makes
+the relevance decisions from your description; with the script, you make them
+by answering questions.
 
 **If you have existing Mathematica notebooks or scripts**, run `/nb-to-wolfbook` on
 them after setup is complete. Point it at a file or a whole directory and it will

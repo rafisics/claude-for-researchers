@@ -1,16 +1,26 @@
 # CLAUDE.md — claude-for-researchers
 
 ## What this repo is
-A public guide and toolkit for researchers (especially physicists) who want to
-use Claude Code productively on long, technically demanding projects. Built from
-real experience on a months-long mathematical research project.
+A public toolkit for researchers (especially physicists) who want to use Claude
+Code productively on long, technically demanding projects. Built from real
+experience on a months-long mathematical research project.
+
+The README guide is one component of the project, not the whole of it. The
+project is expanding into a broader toolkit: standalone tools are developed in
+private repos or branches first and graduate into this public repo only when
+proven in real research use (first candidate: distill, a token filter for
+research command output, currently private). Collaborator: Hooman
+(github.com/hoomanise), who will contribute Lean (theorem prover) tooling.
+The no-overselling rule applies to scope: never announce a tool in the README
+before it has graduated.
 
 ## Repo structure
 - `README.md` — the main guide (prose + rationale + lessons learned)
 - `CLAUDE.md` — this file (instructions for Claude when working on this repo)
 - `.claude/skills/` — reusable skill templates users can drop into their own `.claude/skills/`
 - `.claude/settings.json` — annotated generic settings + hooks
-- `scripts/` — shell scripts for git workflow, GitHub README checks, etc.
+- `scripts/` — shell scripts for git workflow, GitHub README checks, and
+  `bootstrap.sh` (interactive project setup: universal core + relevant skills only)
 - `starter/` — the canonical drop-in package users copy into a new project
   (CLAUDE.md, workbook.tex, brief.tex, next-session-prompts.md, .gitignore, .claude/)
 - `docs/` — supplementary prose guides (e.g. condensed-notes-guide.md)
@@ -49,6 +59,11 @@ who is a fluent programmer but has never used Claude Code.
    help you recover from mistakes. Large uncommitted working sets do not.
 8. The dual-remote pattern (personal GitHub + institution GitLab, different identities)
    is common in academia and needs explicit setup.
+9. The "holy trinity" — workbook.tex, brief.tex, next-session-prompts.md — plus
+   CLAUDE.md is universal: every project gets those four. Everything else (skills,
+   staging folders, Wolfbook, Overleaf) is conditional on the project. Bootstrapping
+   (the README prompt and scripts/bootstrap.sh) must install by relevance, never
+   everything.
 
 ## Source project (for reference and examples)
 The guide was built from experience on a real research project. That project lives at:
@@ -107,5 +122,9 @@ Session was compacted. Last known state is in the "Current status" section above
 To resume: start new session, open next-session-prompts.md, paste the top prompt.
 
 ## ⚠️ Auto-saved before context compact [2026-06-10 19:25]
+Session was compacted. Last known state is in the "Current status" section above.
+To resume: start new session, open next-session-prompts.md, paste the top prompt.
+
+## ⚠️ Auto-saved before context compact [2026-06-11 17:17]
 Session was compacted. Last known state is in the "Current status" section above.
 To resume: start new session, open next-session-prompts.md, paste the top prompt.
