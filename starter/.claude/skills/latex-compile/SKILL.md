@@ -1,104 +1,133 @@
 ---
 name: latex-compile
-description: Compile a LaTeX document, fix all errors and overfull boxes cleanly. Use this instead of running pdflatex manually — it avoids the latexmk stale-log trap and silent grep failures on binary log output.
+description: Compile a LaTeX document and fix every error plus aesthetic issue (overfull/underfull boxes, widows, alignment, fonts) for a clean PDF and log. Use this instead of running pdflatex/latexmk manually — it avoids the latexmk stale-log trap and silent grep failures on binary log output, and it reformats rather than rewording.
 ---
 # latex-compile
 
-Compile a LaTeX document, fix errors and overfull hboxes, and report a clean result.
+Compile a LaTeX document, fix all errors **and** all aesthetic issues so the PDF is clean
+and the log is empty — without ever altering content to make things fit.
 
 ## When to invoke
 After any edit to a .tex file. Also invoke before committing.
 
 ## Input
-The user may specify a file: `/latex-compile brief.tex`. Default: `workbook.tex`.
-Work from the project root (wherever CLAUDE.md lives).
+The user may specify one or more files: `/latex-compile brief.tex workbook.tex`.
+Default: `workbook.tex`. Work from the project root (wherever CLAUDE.md lives).
 
-## 1. Compile — always force a real pass
+## 1. Compile — always force a real pass, capture stdout
 
-**Critical:** never use `latexmk` to capture warnings. When `latexmk` decides targets
-are up-to-date it skips compilation entirely; the `.log` it leaves is then **stale**
-and will under-report (or zero-out) overfull warnings. Always force a real `pdflatex`
-pass and capture from its **stdout**, not the `.log` file:
+**Critical: never trust the `.log` for warnings.** When `latexmk` decides targets are
+up-to-date it skips compilation and leaves a **stale** log that under-reports (or zeroes
+out) overfull warnings. Force a real `pdflatex` pass and capture its **stdout**:
 
 ```
 pdflatex -interaction=nonstopmode <file> > /tmp/tex.txt 2>&1
 ```
 
-Run **twice** when cross-references, TOC, or forward `\ref`s changed. Warnings are
-then current.
+Run **twice** when cross-references, TOC, or forward `\ref`s changed (or a manual `\label`
+bibliography needs a second pass to resolve `\cite`).
 
-**Always use `grep -a`.** pdflatex embeds binary font-path bytes in its output, so
-plain `grep` silently treats the file as binary and matches nothing. Every grep below
-uses `-a`.
+**Always use `grep -a`.** pdflatex embeds binary font-path bytes in its output, so plain
+`grep` treats the stream as binary and matches nothing. Every grep below uses `-a`.
 
-## 2. Fix fatal errors first
+## 2. Collect ALL issues from the fresh stdout
 
 ```
-grep -anE "^! |LaTeX Error|Undefined control sequence|Runaway argument|Emergency stop" /tmp/tex.txt
+grep -anE "^! |LaTeX Error|Undefined|Overfull|Underfull|multiply defined|Font (shape|Warning)|File .*not found" /tmp/tex.txt
 ```
 
-The `! ...` line and the `l.<N>` line below it locate the fault. Common causes:
+| Category | Marker | Threshold to fix |
+|---|---|---|
+| Fatal errors | `! `, `LaTeX Error`, `Runaway argument`, `Emergency stop` | Always |
+| Undefined refs/cites | `Reference … undefined`, `Citation … undefined` | Always (or note if intentional forward ref) |
+| Overfull hbox | `Overfull \hbox … too wide by Xpt` | Fix if X > 5pt (see triage) |
+| Underfull hbox | `Underfull \hbox … badness N` | Fix if N ≥ 1000 |
+| Over/underfull vbox | `Overfull \vbox`, `Underfull \vbox … badness N` | vbox: always; underfull vbox: N ≥ 10000 |
+| Font warnings | `Font shape … not found`, `LaTeX Font Warning` | Fix (but see the harmless cases in §6) |
+| Missing packages | `File … not found` | Always |
+| Multiply-defined labels | `multiply defined` | Always |
+
+## 3. Fix fatal errors first
+
+The `! …` line and the `l.<N>` line below it locate the fault.
 - **Undefined control sequence** → check macro definitions / `\newcommand` spelling
-- **Missing `{` or `}`** → stray brace; count braces around the offending line
-- **Missing `$`** → stray character in math, or fragile macro in section title
-  → use `\DeclareRobustCommand` or `\texorpdfstring`
+- **Missing `{`/`}`** → stray brace; count braces around the line
+- **Missing `$`** → stray char in math, or a fragile macro in a section title →
+  `\DeclareRobustCommand` or `\texorpdfstring`
 - **`\begin{X}` without `\end{X}`** → find the unclosed environment
-- **`File not found`** → missing `\usepackage` or missing dependency
+- **`File not found`** → add `\usepackage` or report the missing dependency
 
-Fix in source, recompile, repeat until the fatal-error grep returns nothing.
+Recompile and repeat until the fatal grep is empty.
 
-## 3. Triage overfull \hbox warnings by severity
+## 4. Undefined references and citations
+- Label/cite exists in the document → just add a second compile pass.
+- Label exists only in a **different file** (cross-file `\ref`) → it can never resolve.
+  Replace `\ref{label}` with the section/theorem title as literal text — e.g.
+  ``\S\,``Title of that section''``. Never leave a dangling `\ref` that prints `??`.
 
-Overfulls come in three flavors — `in paragraph at lines N--M`, `in alignment at
-lines N--M`, and `detected at line N` (math/box mode). Capture all three:
+## 5. Overfull hboxes — triage, then REFORMAT (never reword)
 
-```
-grep -a "Overfull" /tmp/tex.txt \
-  | grep -aoE "\([0-9.]+pt too wide\).*(at lines [0-9]+(--[0-9]+)?|at line [0-9]+)" \
-  | sort -t'(' -k2 -rn
-```
+Overfulls come in three flavors: `in paragraph at lines N--M`, `in alignment at lines
+N--M`, and `detected at line N` (math/box mode — the wide row is a line or two **above** N).
 
 Triage by overrun magnitude:
-- **> 10pt** — visibly runs off the page → fix
-- **5–10pt** — noticeable → fix if quick, otherwise note
-- **< 5pt** — below visual threshold → leave; `\emergencystretch=3em` in the preamble absorbs these
-
-Read the target location (use `Read` with offset) before editing to see whether it is
-prose, inline math, a display equation, or a table. A `detected at line N` warning
-points at the *closing* line of a math environment (`\end{align}`, `\]`), so the
-offending wide row is typically a line or two **above** N.
-
-## 4. Fix rules — REFORMAT, never reword
+- **> 10pt** — runs off the page → fix
+- **5–10pt** — noticeable → fix if quick
+- **< 5pt** — below visual threshold → leave; `\hfuzz=1pt` / `\emergencystretch=3em` in
+  the preamble absorbs these silently
 
 **Hard rule: do not change mathematical content, wording, table data, or abbreviate
-headers to make things fit.** Content edits silently lose load-bearing text. Fix
-overflow only by changing *layout*:
+headers to make things fit.** Fix overflow only by changing *layout*:
+- **Inline `$…$` that overruns** → promote to a `\[ … \]` display
+- **Long single-line display** → break before a relational operator (`=`, `\le`, `\to`).
+  In `align`, end the line with `\notag\\` then `&\quad` continuation. **Keep the `\label`
+  and number** — `\notag` goes only on continuation lines, never the labelled one
+- **Long boxed equation** → `\boxed{\begin{aligned} … \end{aligned}}`
+- **Wide smallmatrix-bracket display** → split the multi-integral/product across two
+  `align` lines, or wrap the whole display in `{\small … }`
+- **Wide table** → `\small` / `\footnotesize` / `\resizebox{\textwidth}{!}{…}` —
+  do NOT abbreviate headers or cells
+- **Overflowing prose** → `\begin{sloppypar}…\end{sloppypar}`; or split a long unbreakable
+  `\texttt`/`\code` token across two `\code{…}` units at a natural boundary; or set
+  multi-line code as a `verbatim` / `\begin{quote}\small\ttfamily\raggedright … \end{quote}`
+  block (raggedright avoids the new overfull but yields harmless underfulls)
+- **Single wide inline token** → `\allowbreak` at a factor boundary, or promote to display
 
-- **Inline math `$...$` that overruns** → promote to display `\[ ... \]`
-- **Long single-line display** → break before a relational operator (`=`, `\le`,
-  `\to`, …). In an `align`: insert `\notag\\` then `& \quad` continuation.
-  **Preserve the `\label` and equation number** — put `\notag` only on the
-  continuation line, never on the labelled line.
-- **Long boxed equation** → `\boxed{\begin{aligned} ... \end{aligned}}`
-- **Wide table** → `\small`, `\footnotesize`, or `\resizebox{\textwidth}{!}{...}`.
-  Do NOT abbreviate column headers or cell content.
-- **Overflowing prose paragraph** → wrap in `\begin{sloppypar}...\end{sloppypar}`
-- **Single wide inline token** with no break point → `\allowbreak` at a factor
-  boundary, or promote to display
+## 6. Other aesthetic issues
+- **Underfull hbox (badness ≥ 1000)** → restructure so the last line fills; for a genuinely
+  ragged/centred context it's expected — suppress locally with `\hbadness=1000` only if
+  unavoidable. (Beware: `\emergencystretch` can turn a sub-`\hfuzz` overfull into a noisy
+  underfull — prefer fixing the overfull or leaving it under `\hfuzz`.)
+- **Widows/orphans** → `\widowpenalty=10000 \clubpenalty=10000` in the preamble; for one
+  case, `\needspace{3\baselineskip}` or a manual break before the paragraph.
+- **Alignment** → in `align`, every row needs the same number of `&`; remove blank lines
+  inside `align` (spurious gap) and a stray trailing `\\` on the last row.
+- **Fonts** → `OT1` warnings: ensure `\usepackage[T1]{fontenc}`. Use `\bfseries`/`\itshape`,
+  not `\bf`/`\it`. *Harmless:* `\code{}`/`\texttt` inside a bold section title falls back
+  to medium typewriter (CM has no bold tt) — a Font **Info**, not a warning; leave it.
+- **Typography** → thin space `\,` before units / between adjacent integrals; `\ldots`/`\dots`
+  not `...`; ``` ``…'' ``` not `"…"`; `e.g.\ `/`cf.\ ` to avoid double sentence-spacing.
 
-## 5. Verify
+## 7. hyperref / PDF-bookmark and Unicode gotchas
+- A macro or math in a `\section`/`\subsection` title makes hyperref choke building the PDF
+  bookmark — `Token not allowed in a PDF string` (harmless) or `Illegal parameter number in
+  \Hy@…` (a real error, from a multi-arg macro like a smallmatrix-bracket in the title).
+  Wrap the title: `\section{\texorpdfstring{<TeX with macros>}{plain-text bookmark}}`.
+- **Literal Unicode** (ω, π, … in code listings or prose) under `pdflatex`+`inputenc` needs
+  `\DeclareUnicodeCharacter{03C9}{\ensuremath{\omega}}` (and `{03C0}{…\pi}` etc.) in the
+  preamble, or it errors with `Unicode character … not set up for use with LaTeX`. In a
+  `verbatim` block prefer ASCII (`Pi`, names) — declarations don't fully apply there.
 
-After fixes, recompile with `pdflatex` (same `> /tmp/tex.txt` capture) and re-run
-the step-3 grep on the **fresh** stdout. Confirm targeted overfulls are gone or < 5pt,
-and that no new `! ` errors were introduced.
+## 8. Verify
+Recompile with `pdflatex` (same `> /tmp/tex.txt` capture), re-run the §2 grep on the
+**fresh** stdout, and confirm: no `! ` errors, targeted overfulls gone or < 5pt, no new
+issues, refs/cites resolved.
 
-## 6. Report
-
+## 9. Report
 ```
 Compiled <file>: N pages.
 Errors fixed: <list or "none">
-Overfull fixes: <list with rule used, or "none">
+Aesthetic fixes: <list with the layout rule used, or "none">
 Remaining warnings: <list or "none — log is clean">
 ```
-
 If a warning is genuinely unavoidable, say so and explain why it is harmless.
