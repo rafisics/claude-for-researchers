@@ -93,7 +93,7 @@ def chart_setup():
     nd(g, 'cla',    'Write CLAUDE.md\n'
                     'goal · file map · conventions · git config\n'
                     'current status · open tasks · skills list',  S_PROC)
-    nd(g, 'cond',   'Write condensed notes\n'
+    nd(g, 'cond',   'Write brief.tex (condensed reference)\n'
                     'established results only · no proofs\n'
                     '15–30 pages · read first every session',      S_PROC)
     nd(g, 'nsp',    'Write next-session-prompts.md\n'
@@ -131,13 +131,13 @@ def chart_session():
     nd(g, 'start',  'Open Claude Code',                            S_TERM)
     nd(g, 'load',   'CLAUDE.md auto-loads\n'
                     'read top task from next-session-prompts.md\n'
-                    'read condensed notes if context is stale',    S_PROC)
+                    'read brief.tex if context is stale',          S_PROC)
     nd(g, 'work',   'Work: edit · compile · compute',              S_PROC)
     nd(g, 'dchk',   'Natural\ncheckpoint?',                        S_DEC)
     nd(g, 'cmit',   'git commit\nsmall + descriptive message',     S_PROC)
     nd(g, 'drsl',   'Result\nestablished?',                        S_DEC)
-    nd(g, 'upd',    'Update main document\n'
-                    'sync condensed notes\n'
+    nd(g, 'upd',    'Update workbook.tex\n'
+                    'sync brief.tex\n'
                     'update CLAUDE.md status',                     S_PROC)
     nd(g, 'ddon',   'Session\ndone?',                              S_DEC)
     nd(g, 'wrap',   'Update CLAUDE.md: last result + next step\n'
