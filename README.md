@@ -242,11 +242,14 @@ soften it.
 > - `.claude/skills/`: `latex-compile`, `sync-condensed`, `nb-to-wolfbook`,
 >   `verify-citation`, `reality-check`, `cross-validate`
 >
-> **Generate these from what I told you at the start of this session.** Use the
-> starter files ONLY as the structural template — preamble, macros, section
-> layout, comment style. Fill every section with the actual content of THIS
-> project. Do not leave a single `[placeholder]` or `[e.g., ...]` line anywhere.
-> Where you genuinely do not have the information, ask me — do not invent it.
+> **Generate these from what I told you at the start of this session.** All four
+> files below must be customised to THIS project. Use the starter files ONLY for
+> their structure — preamble, macros, section layout, comment style — and replace
+> every example sentence and every bracketed stub (`[Project Title]`,
+> `[Statement of main result.]`, `[SHORT DESCRIPTIVE NAME]`, `[e.g., ...]`, etc.)
+> with real content drawn from my description. Do not leave a single bracketed
+> placeholder anywhere. If you genuinely lack the information for a section, ask
+> me — do not invent it and do not leave the template text in place.
 > - `CLAUDE.md` — based on `examples/CLAUDE-template.md`. Fill in Goal, Files,
 >   Conventions, Current status, my real git remotes, my notation, and my
 >   numerics setup, all from what I described.
@@ -254,11 +257,16 @@ soften it.
 >   the real title and author, write a real introduction and a real conventions
 >   section from my description, and make sections for the actual topics of this
 >   project. Short is fine; generic is not — it must be about MY project.
-> - `brief.tex` — keep the starter's structure and colour macros, then write the
->   real current state: what is established, conjectured, and open, plus the key
->   conventions, from my description.
-> - `next-session-prompts.md` — keep the starter's structure, then write a real
->   first task at the top: the concrete next step for this project.
+> - `brief.tex` — keep the starter's preamble and the `\established` /
+>   `\conjectured` / `\open` colour macros, set the real title and author, then
+>   fill the Main results, Conventions, and Open problems sections with this
+>   project's actual current state. Tag each item `[ESTABLISHED]`, `[CONJECTURED]`,
+>   or `[OPEN]`. Delete the example theorem/definition stubs — do not ship them.
+> - `next-session-prompts.md` — keep the structure (top task block + DONE log),
+>   then write a real first task: its context, the precise what-to-do (naming the
+>   file and section), and a concrete success criterion — all for this project.
+>   Replace the `Prompt A` / `Prompt B` example text entirely; leave the DONE log
+>   empty since nothing is done yet.
 >
 > If `workbook.tex`, `brief.tex`, or any target file already exists, do NOT
 > overwrite it — tell me and stop.
