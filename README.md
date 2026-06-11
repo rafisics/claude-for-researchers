@@ -246,7 +246,7 @@ soften it.
 > - `.claude/settings.json` (from `starter/.claude/settings.json`)
 > - `.claude/hooks/pre-compact.sh` and `.claude/hooks/promise-checker.sh`
 > - `.claude/skills/`: `latex-compile`, `sync-brief`, `nb-to-wolfbook`,
->   `verify-citation`, `reality-check`, `cross-validate`, `overleaf-sync`
+>   `sync-wb-nb`, `verify-citation`, `reality-check`, `cross-validate`, `overleaf-sync`
 > - `.gitignore` (from `starter/.gitignore`)
 >
 > **Generate these from what I told you at the start of this session.** All four
@@ -1417,6 +1417,14 @@ cells (computed results) are not preserved in the conversion — re-run the cell
 after opening the `.wb` file in VS Code. Graphics-heavy notebooks may need minor
 manual cleanup. Convert once, then work in `.wb` going forward.
 
+**If your collaborators use Mathematica desktop**, you can keep a paired `.nb` file
+in sync automatically. The `/sync-wb-nb` skill (included in the starter) propagates
+every edit you make in the `.wb` into the corresponding `.nb`, using a wolframscript
+round-trip that preserves Mathematica's internal notebook structure. Run it after
+each session, or add a standing instruction to CLAUDE.md so Claude runs it
+automatically. Your collaborators open the `.nb` in Mathematica as usual; you work
+entirely in Wolfbook. The two files stay identical in content.
+
 **Plain `.m` script files** (not notebooks) work well for computation scripts that
 Claude runs or modifies. Claude reads and edits `.m` files the same as Python
 scripts — no special handling needed.
@@ -1934,6 +1942,7 @@ starter/
         ├── latex-compile.md         ← /latex-compile skill
         ├── sync-brief.md            ← /sync-brief skill
         ├── nb-to-wolfbook.md        ← /nb-to-wolfbook skill
+        ├── sync-wb-nb.md            ← /sync-wb-nb skill
         ├── verify-citation.md       ← /verify-citation skill
         ├── reality-check.md         ← /reality-check skill
         ├── cross-validate.md        ← /cross-validate skill
@@ -1960,6 +1969,7 @@ in Part I.
 | [`starter/.claude/skills/latex-compile.md`](starter/.claude/skills/latex-compile.md) | Skill: compile LaTeX, fix common errors, report result |
 | [`starter/.claude/skills/sync-brief.md`](starter/.claude/skills/sync-brief.md) | Skill: propagate load-bearing changes from workbook.tex to brief.tex |
 | [`starter/.claude/skills/nb-to-wolfbook.md`](starter/.claude/skills/nb-to-wolfbook.md) | Skill: convert .nb notebooks and .m scripts to Wolfbook's .wb format |
+| [`starter/.claude/skills/sync-wb-nb.md`](starter/.claude/skills/sync-wb-nb.md) | Skill: propagate .wb edits into the paired .nb, keeping it in sync for Mathematica collaborators |
 | [`starter/.claude/skills/verify-citation.md`](starter/.claude/skills/verify-citation.md) | Skill: verify a paper exists on Semantic Scholar / arXiv before writing it as a citation |
 | [`starter/.claude/skills/reality-check.md`](starter/.claude/skills/reality-check.md) | Skill: re-derive a contested result in isolation to detect sycophantic capitulation |
 | [`starter/.claude/skills/cross-validate.md`](starter/.claude/skills/cross-validate.md) | Skill: format a physics claim for cross-model validation against Gemini or ChatGPT |
