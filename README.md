@@ -245,8 +245,21 @@ soften it.
 > **Copy these verbatim** — they are generic infrastructure and need no edits:
 > - `.claude/settings.json` (from `starter/.claude/settings.json`)
 > - `.claude/hooks/pre-compact.sh` and `.claude/hooks/promise-checker.sh`
-> - `.claude/skills/`: `latex-compile`, `sync-brief`, `nb-to-wolfbook`,
->   `sync-wb-nb`, `verify-citation`, `reality-check`, `cross-validate`, `overleaf-sync`
+> - `.claude/skills/`: for each skill — `latex-compile`, `sync-brief`,
+>   `nb-to-wolfbook`, `sync-wb-nb`, `verify-citation`, `reality-check`,
+>   `cross-validate`, `overleaf-sync` — check `~/.claude/skills/<name>/SKILL.md`
+>   first:
+>   - **Exists globally and covers the same ground**: skip — the global skill is
+>     already available in every project, a local copy adds nothing.
+>   - **Exists globally but the starter version is meaningfully more complete**
+>     (has explicit error-handling rules, severity thresholds, or hard constraints
+>     the global version lacks): install the starter version locally and report the
+>     key differences in one sentence so I can decide whether to update my global
+>     skill too.
+>   - **Does not exist globally**: copy from `starter/.claude/skills/<name>/SKILL.md`.
+>   End with a one-line summary: which skills were found globally (skipped), which
+>   were installed locally, and which were installed locally because the starter
+>   version is better.
 > - `.gitignore` (from `starter/.gitignore`)
 >
 > **Generate these from what I told you at the start of this session.** All four
@@ -281,7 +294,8 @@ soften it.
 > Create all of the above with the Write tool. Then run these install commands —
 > I will approve the few one-time permission prompts they trigger:
 > - `brew install rtk && rtk init -g --auto-patch`
-> - `curl -o .claude/skills/pdf.md https://raw.githubusercontent.com/anthropics/skills/main/skills/pdf/SKILL.md`
+> - `mkdir -p ~/.claude/skills/pdf && curl -o ~/.claude/skills/pdf/SKILL.md https://raw.githubusercontent.com/anthropics/skills/main/skills/pdf/SKILL.md`
+>   (skip if `~/.claude/skills/pdf/SKILL.md` already exists)
 > - `code --install-extension wolfbook.wolfbook`
 > - `git init` (only if this is not already a git repo)
 
