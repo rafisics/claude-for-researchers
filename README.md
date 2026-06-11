@@ -1108,21 +1108,28 @@ sections to have the same structure and level of detail, a skill enforces that.
 
 ### How to write a skill
 
-Skills live in `.claude/skills/` in your project directory. There are two formats:
+Skills live in `.claude/skills/` in your project directory. Each skill is a folder
+named after the skill, containing a file called `SKILL.md`:
 
 ```
-.claude/skills/latex-compile.md          ← flat: one file, self-contained
-.claude/skills/github-readme-math/       ← subfolder: skill + companion files
-                    SKILL.md
-                    render-math.js
+.claude/skills/
+    latex-compile/
+        SKILL.md
+    sync-brief/
+        SKILL.md
+    github-readme-math/       ← a skill that also ships a companion script
+        SKILL.md
+        render-math.js
 ```
 
-Use the **flat format** (a single `.md` file) for almost every research skill —
-it is simpler and all the instructions fit in one place. Use the **subfolder format**
-only when a skill genuinely needs companion files alongside it: a helper script,
-a reference document too long to embed, or a template file. If there is only a
-`SKILL.md` inside the folder and nothing else, that is the flat format with
-unnecessary nesting — use the flat file instead.
+**The folder is required.** A plain `.md` file placed directly in `.claude/skills/`
+will not be registered as a slash command — typing `/skill-name` will return
+"Unknown skill". Claude Code only picks up skills that live in a named subfolder
+with a `SKILL.md` inside.
+
+If a skill needs companion files (a helper script, a reference document, a template),
+add them alongside `SKILL.md` in the same folder. Otherwise the folder contains only
+`SKILL.md` — that is fine and is the normal case for research skills.
 
 There is also a **global** location — `~/.claude/skills/` — for skills you want
 available in every project without copying them. See
@@ -1951,14 +1958,14 @@ starter/
     │   ├── pre-compact.sh           ← auto-save before context compression
     │   └── promise-checker.sh       ← Stop hook: catches "I'll remember" without a write
     └── skills/
-        ├── latex-compile.md         ← /latex-compile skill
-        ├── sync-brief.md            ← /sync-brief skill
-        ├── nb-to-wolfbook.md        ← /nb-to-wolfbook skill
-        ├── sync-wb-nb.md            ← /sync-wb-nb skill
-        ├── verify-citation.md       ← /verify-citation skill
-        ├── reality-check.md         ← /reality-check skill
-        ├── cross-validate.md        ← /cross-validate skill
-        └── overleaf-sync.md         ← /overleaf-sync skill
+        ├── latex-compile/SKILL.md   ← /latex-compile skill
+        ├── sync-brief/SKILL.md      ← /sync-brief skill
+        ├── nb-to-wolfbook/SKILL.md  ← /nb-to-wolfbook skill
+        ├── sync-wb-nb/SKILL.md      ← /sync-wb-nb skill
+        ├── verify-citation/SKILL.md ← /verify-citation skill
+        ├── reality-check/SKILL.md   ← /reality-check skill
+        ├── cross-validate/SKILL.md  ← /cross-validate skill
+        └── overleaf-sync/SKILL.md   ← /overleaf-sync skill
 ```
 
 Copy the files, fill in `CLAUDE.md` with your project's details, and you are ready
@@ -1978,14 +1985,14 @@ in Part I.
 | [`starter/.gitignore`](starter/.gitignore) | Ignore rules: Overleaf clone, LaTeX build artifacts, Python/Wolfram scratch, generated outputs |
 | [`starter/.claude/settings.json`](starter/.claude/settings.json) | Annotated generic settings: permissions that allow routine commands, ask before anything dangerous, and block nothing by default + hooks for pre-compact, dual-remote push, and promise-checker |
 | [`starter/.claude/hooks/pre-compact.sh`](starter/.claude/hooks/pre-compact.sh) | Pre-compact hook: timestamps CLAUDE.md and snapshots the task log before context compression |
-| [`starter/.claude/skills/latex-compile.md`](starter/.claude/skills/latex-compile.md) | Skill: compile LaTeX, fix common errors, report result |
-| [`starter/.claude/skills/sync-brief.md`](starter/.claude/skills/sync-brief.md) | Skill: propagate load-bearing changes from workbook.tex to brief.tex |
-| [`starter/.claude/skills/nb-to-wolfbook.md`](starter/.claude/skills/nb-to-wolfbook.md) | Skill: convert .nb notebooks and .m scripts to Wolfbook's .wb format |
-| [`starter/.claude/skills/sync-wb-nb.md`](starter/.claude/skills/sync-wb-nb.md) | Skill: propagate .wb edits into the paired .nb, keeping it in sync for Mathematica collaborators |
-| [`starter/.claude/skills/verify-citation.md`](starter/.claude/skills/verify-citation.md) | Skill: verify a paper exists on Semantic Scholar / arXiv before writing it as a citation |
-| [`starter/.claude/skills/reality-check.md`](starter/.claude/skills/reality-check.md) | Skill: re-derive a contested result in isolation to detect sycophantic capitulation |
-| [`starter/.claude/skills/cross-validate.md`](starter/.claude/skills/cross-validate.md) | Skill: format a physics claim for cross-model validation against Gemini or ChatGPT |
-| [`starter/.claude/skills/overleaf-sync.md`](starter/.claude/skills/overleaf-sync.md) | Skill: sync a git clone of a shared Overleaf project — status/pull/diff, and a safe merge-only publish |
+| [`starter/.claude/skills/latex-compile/SKILL.md`](starter/.claude/skills/latex-compile/SKILL.md) | Skill: compile LaTeX, fix common errors, report result |
+| [`starter/.claude/skills/sync-brief/SKILL.md`](starter/.claude/skills/sync-brief/SKILL.md) | Skill: propagate load-bearing changes from workbook.tex to brief.tex |
+| [`starter/.claude/skills/nb-to-wolfbook/SKILL.md`](starter/.claude/skills/nb-to-wolfbook/SKILL.md) | Skill: convert .nb notebooks and .m scripts to Wolfbook's .wb format |
+| [`starter/.claude/skills/sync-wb-nb/SKILL.md`](starter/.claude/skills/sync-wb-nb/SKILL.md) | Skill: propagate .wb edits into the paired .nb, keeping it in sync for Mathematica collaborators |
+| [`starter/.claude/skills/verify-citation/SKILL.md`](starter/.claude/skills/verify-citation/SKILL.md) | Skill: verify a paper exists on Semantic Scholar / arXiv before writing it as a citation |
+| [`starter/.claude/skills/reality-check/SKILL.md`](starter/.claude/skills/reality-check/SKILL.md) | Skill: re-derive a contested result in isolation to detect sycophantic capitulation |
+| [`starter/.claude/skills/cross-validate/SKILL.md`](starter/.claude/skills/cross-validate/SKILL.md) | Skill: format a physics claim for cross-model validation against Gemini or ChatGPT |
+| [`starter/.claude/skills/overleaf-sync/SKILL.md`](starter/.claude/skills/overleaf-sync/SKILL.md) | Skill: sync a git clone of a shared Overleaf project — status/pull/diff, and a safe merge-only publish |
 | [`starter/.claude/hooks/promise-checker.sh`](starter/.claude/hooks/promise-checker.sh) | Stop hook: catches "I'll remember / I've saved" without a corresponding file write |
 | [`docs/condensed-notes-guide.md`](docs/condensed-notes-guide.md) | Detailed guide on what to include in and exclude from brief.tex |
 | [`scripts/git-push-both.sh`](scripts/git-push-both.sh) | Dual-remote push: push to GitHub (personal) and GitLab (institution) with separate identities |
