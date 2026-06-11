@@ -1,9 +1,9 @@
-# Guide: The Condensed Notes Document
+# Guide: writing brief.tex (the condensed reference)
 
-The condensed notes document solves a specific problem: your main document grows
-too large for Claude to hold in context, but Claude needs to understand your
-project accurately to help you. The condensed document is what Claude reads at
-the start of new sessions instead of the full document.
+`brief.tex` solves a specific problem: `workbook.tex` grows too large for Claude to
+hold in context, but Claude needs to understand your project accurately to help you.
+`brief.tex` is what Claude reads at the start of new sessions instead of the full
+working record.
 
 ---
 
@@ -13,9 +13,11 @@ A SHORT (15–30 pages / 1000–3000 lines), SELF-CONTAINED reference document.
 It contains the current state of the project — theorems, key formulas, results,
 open questions — without proofs, derivations, or history.
 
-It is NOT a summary of the main document. It is a COMPRESSED KNOWLEDGE BASE
-that a reader (or Claude) could use to understand the current state of the
-project from scratch, without reading anything else.
+It is NOT a summary of `workbook.tex`. It is a COMPRESSED KNOWLEDGE BASE that a
+reader (or Claude) could use to understand the current state of the project from
+scratch, without reading anything else. Because it states results cleanly without
+the working-out, `brief.tex` is also the document closest to an eventual published
+paper.
 
 ---
 
@@ -27,13 +29,13 @@ project from scratch, without reading anything else.
 - The current status: what is proved, what is conjectured, what is open
 - Open problems, ranked by importance
 - Notational conventions (what every symbol means)
-- Cross-references to the main document (section labels, equation names)
+- Cross-references to `workbook.tex` (section labels, equation names)
   so Claude can navigate there when needed
 - Recent corrections: if you found an error and fixed it, the corrected
   statement — with a note that the old version was wrong
 
 **NO — exclude these:**
-- Proofs and derivations (these are in the main document)
+- Proofs and derivations (these are in `workbook.tex`)
 - Pedagogical examples and motivation
 - History of how you arrived at results
 - "We will see in §X that..." forward references
@@ -57,7 +59,7 @@ A structure that works well for mathematical research:
 
 §3-N Results by topic
    — Each section = one topic. Theorem, formula, key data.
-     Reference to main document for proof.
+     Reference to workbook.tex for proof.
      Mark what is established vs what is a conjecture.
 
 §N+1 Numerical results
@@ -71,18 +73,18 @@ A structure that works well for mathematical research:
 
 ## Sync discipline
 
-The condensed document and the main document will drift apart unless you
-actively sync them. Two situations require a sync:
+`brief.tex` and `workbook.tex` will drift apart unless you actively sync them.
+Two situations require a sync:
 
 1. **New result established:** After adding a theorem or corrected formula to
-   the main document, add the statement (not the proof) to the condensed document.
+   `workbook.tex`, add the statement (not the proof) to `brief.tex`.
 
-2. **Correction:** If you find that something in the condensed document is wrong,
-   fix it immediately. A wrong condensed document is worse than no condensed
-   document — Claude will confidently work from incorrect information.
+2. **Correction:** If you find that something in `brief.tex` is wrong, fix it
+   immediately. A wrong `brief.tex` is worse than no `brief.tex` — Claude will
+   confidently work from incorrect information.
 
 The `/sync-condensed` skill automates part of this: it identifies which changes
-in the main document are "load-bearing" (new theorems, corrected formulas) and
+in `workbook.tex` are "load-bearing" (new theorems, corrected formulas) and
 prompts you to propagate them.
 
 ---
@@ -90,15 +92,14 @@ prompts you to propagate them.
 ## What NOT to do
 
 **Don't let it grow.** The whole point is that it's short. When it exceeds
-~30 pages, prune it: move historical context to the main document, collapse
+~30 pages, prune it: move historical context to `workbook.tex`, collapse
 routine results into a single table, remove anything that is not load-bearing.
 
-**Don't put in-progress work in it.** The condensed document contains what
-is established. If you're in the middle of a calculation, that goes in
-next-session-prompts, not here.
+**Don't put in-progress work in it.** `brief.tex` contains what is established.
+If you're in the middle of a calculation, that goes in next-session-prompts, not here.
 
-**Don't stop maintaining it.** A condensed document that is 3 months out of
-date is useless. Treat syncing it as part of the cost of every new result.
+**Don't stop maintaining it.** A `brief.tex` that is 3 months out of date is
+useless. Treat syncing it as part of the cost of every new result.
 
 ---
 

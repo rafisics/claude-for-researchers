@@ -11,7 +11,9 @@ real experience on a months-long mathematical research project.
 - `.claude/skills/` — reusable skill templates users can drop into their own `.claude/skills/`
 - `.claude/settings.json` — annotated generic settings + hooks
 - `scripts/` — shell scripts for git workflow, GitHub README checks, etc.
-- `examples/` — concrete template files (CLAUDE.md template, next-session-prompts, condensed-notes pattern)
+- `starter/` — the canonical drop-in package users copy into a new project
+  (CLAUDE.md, workbook.tex, brief.tex, next-session-prompts.md, .gitignore, .claude/)
+- `docs/` — supplementary prose guides (e.g. condensed-notes-guide.md)
 
 ## Chat formatting
 Plain English in chat. No jargon, no LaTeX. This guide is for people who may
@@ -101,5 +103,9 @@ Session was compacted. Last known state is in the "Current status" section above
 To resume: start new session, open next-session-prompts.md, paste the top prompt.
 
 ## ⚠️ Auto-saved before context compact [2026-06-10 14:53]
+Session was compacted. Last known state is in the "Current status" section above.
+To resume: start new session, open next-session-prompts.md, paste the top prompt.
+
+## ⚠️ Auto-saved before context compact [2026-06-10 19:25]
 Session was compacted. Last known state is in the "Current status" section above.
 To resume: start new session, open next-session-prompts.md, paste the top prompt.

@@ -233,8 +233,7 @@ soften it.
 
 > I want to set up this project using the workflow at
 > https://github.com/Mexregkan/claude-for-researchers/. First read that repo's
-> `starter/` directory and `examples/CLAUDE-template.md` so you know the exact
-> structure of every file. Then:
+> `starter/` directory so you know the exact structure of every file. Then:
 >
 > **Copy these verbatim** — they are generic infrastructure and need no edits:
 > - `.claude/settings.json` (from `starter/.claude/settings.json`)
@@ -251,7 +250,7 @@ soften it.
 > with real content drawn from my description. Do not leave a single bracketed
 > placeholder anywhere. If you genuinely lack the information for a section, ask
 > me — do not invent it and do not leave the template text in place.
-> - `CLAUDE.md` — based on `examples/CLAUDE-template.md`. Fill in Goal, Files,
+> - `CLAUDE.md` — based on `starter/CLAUDE.md`. Fill in Goal, Files,
 >   Conventions, Current status, my real git remotes, my notation, and my
 >   numerics setup, all from what I described.
 > - `workbook.tex` — keep the starter's preamble and theorem environments, set
@@ -1935,9 +1934,7 @@ in Part I.
 | [`starter/.claude/skills/cross-validate.md`](starter/.claude/skills/cross-validate.md) | Skill: format a physics claim for cross-model validation against Gemini or ChatGPT |
 | [`starter/.claude/skills/overleaf-sync.md`](starter/.claude/skills/overleaf-sync.md) | Skill: sync a git clone of a shared Overleaf project — status/pull/diff, and a safe merge-only publish |
 | [`starter/.claude/hooks/promise-checker.sh`](starter/.claude/hooks/promise-checker.sh) | Stop hook: catches "I'll remember / I've saved" without a corresponding file write |
-| [`examples/CLAUDE-template.md`](examples/CLAUDE-template.md) | Heavily commented CLAUDE.md template with all sections; use as the base when filling in manually |
-| [`examples/next-session-prompts-template.md`](examples/next-session-prompts-template.md) | Session log template with worked examples of well-written task descriptions |
-| [`examples/condensed-notes-guide.md`](examples/condensed-notes-guide.md) | Detailed guide on what to include in and exclude from brief.tex |
+| [`docs/condensed-notes-guide.md`](docs/condensed-notes-guide.md) | Detailed guide on what to include in and exclude from brief.tex |
 | [`scripts/git-push-both.sh`](scripts/git-push-both.sh) | Dual-remote push: push to GitHub (personal) and GitLab (institution) with separate identities |
 | [`scripts/readme-latex-check.sh`](scripts/readme-latex-check.sh) | Scan a README for LaTeX commands that GitHub's MathJax does not support |
 

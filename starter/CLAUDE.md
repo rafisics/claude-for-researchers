@@ -95,7 +95,7 @@ script. Never include `generated/` content in workbook.tex without my explicit i
   Only if you collaborate on Overleaf via its git remote. Remove this line otherwise.
 
 ## Writing style in workbook.tex (IMPORTANT)
-<!-- Tell Claude how detailed to be when writing in your main document.
+<!-- Tell Claude how detailed to be when writing in workbook.tex.
      Researchers often want very different levels of detail than Claude's default. -->
 
 workbook.tex is the AUTHORITATIVE, COMPREHENSIVE record. Show every step of every
@@ -105,6 +105,27 @@ computation gives." If in doubt, over-explain.
 
 [Adapt this section to your own preference — some researchers want the opposite:
  terse, theorem-style prose. Be explicit either way.]
+
+## Structure and cross-references in workbook.tex (IMPORTANT)
+<!-- Claude navigates workbook.tex with grep and targeted reads, not by reading top to bottom.
+     These rules make that navigation reliable. -->
+
+- Use \label on every section, subsection, theorem, proposition, equation, and figure.
+  Cross-reference explicitly with \ref / \eqref. More cross-references than you would
+  write for a human reader is the right amount.
+- Maintain a clear section hierarchy (sections → subsections → subsubsections with
+  meaningful names). Flat structure makes targeted reads unreliable.
+
+## Corrections in workbook.tex (NON-NEGOTIABLE)
+<!-- This rule prevents Claude from working from wrong information in future sessions. -->
+
+If something in workbook.tex is discovered to be wrong, REPLACE IT IN PLACE. Do not
+append a correction paragraph later ("earlier I claimed X, but actually Y").
+
+Reason: Claude reads different parts of workbook.tex in each session. If the wrong
+version stays in the file and the correction is only further down, Claude may read
+the wrong statement in a later session and never see the correction. It will then
+work from incorrect information, confidently.
 
 ## Numerics
 <!-- Primary computation engine, venv location, any gotchas. -->
