@@ -8,6 +8,13 @@ This guide is written from real experience running a months-long mathematical re
 project with Claude Code, not a weekend experiment. It covers what works, what wastes time,
 the failure modes you will hit, and how to set up a workflow that survives them.
 
+**What this guide is not.** There are other projects focused on getting Claude to *conduct*
+research autonomously — literature surveys, hypothesis generation, paper drafting.
+This is not that. The goal here is to give you a well-structured workspace and a reliable
+workflow so that *you* can do the research faster and more cleanly: less time on
+housekeeping, better continuity across sessions, fewer mistakes from working in a big
+messy codebase. Claude is the tool; you are the researcher.
+
 ---
 
 ## How to read this guide
