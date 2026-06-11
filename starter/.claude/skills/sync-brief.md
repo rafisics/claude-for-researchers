@@ -1,10 +1,10 @@
-# sync-condensed
+# sync-brief
 
-Propagate load-bearing changes from the main document to the condensed reference.
+Propagate load-bearing changes from workbook.tex to brief.tex.
 
 ## When to invoke
 After establishing a new result, correcting a formula, or completing a section
-in the main document. NOT for every edit — only for changes that affect what
+in workbook.tex. NOT for every edit — only for changes that affect what
 is established.
 
 ## What "load-bearing" means
@@ -37,7 +37,7 @@ When in doubt, ask the user.
    - Add the new theorem statement (without proof)
    - Replace the old formula with the corrected one
    - Update the "Status" line (ESTABLISHED / OPEN / CORRECTED)
-   - Add a cross-reference to the main document section label
+   - Add a cross-reference to the workbook.tex section label
 
 5. **Compile brief.tex** (use `/latex-compile brief.tex`).
 
@@ -48,7 +48,7 @@ When in doubt, ask the user.
 
 ## Output format
 ```
-Propagated: [result name] from sec:[label] → condensed §N (eq. [label])
+Propagated: [result name] from sec:[label] → brief.tex §N (eq. [label])
 Skipped (not load-bearing): [what and why]
-Condensed.tex: M pages, clean.
+brief.tex: M pages, clean.
 ```

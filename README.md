@@ -238,7 +238,7 @@ soften it.
 > **Copy these verbatim** — they are generic infrastructure and need no edits:
 > - `.claude/settings.json` (from `starter/.claude/settings.json`)
 > - `.claude/hooks/pre-compact.sh` and `.claude/hooks/promise-checker.sh`
-> - `.claude/skills/`: `latex-compile`, `sync-condensed`, `nb-to-wolfbook`,
+> - `.claude/skills/`: `latex-compile`, `sync-brief`, `nb-to-wolfbook`,
 >   `verify-citation`, `reality-check`, `cross-validate`, `overleaf-sync`
 > - `.gitignore` (from `starter/.gitignore`)
 >
@@ -295,13 +295,13 @@ convert everything to Wolfbook's `.wb` format in one step — re-run the cells
 afterwards to regenerate output.
 
 **Why the install commands prompt (once).** The `settings.json` Claude just wrote
-allows ordinary commands to run freely, asks before recoverable-but-risky ones
-(`rm`, `mv`, `git reset --hard`, …), and denies the catastrophic ones outright
-(`sudo`, `mkfs`, …). That is the behaviour you want: Claude runs LaTeX, Python, and
-git without interrupting you, and only pauses before something risky. But Claude
-Code reads `settings.json` once, at session start, so it does not take effect until
-your *next* session. That is why the four install commands in this very first
-session ask for permission. Approve them; from the next session on, routine
+allows ordinary commands to run freely and asks before anything dangerous (`rm`,
+`mv`, `git reset --hard`, `sudo`, …) — it blocks nothing outright, so you stay in
+control without ever being stuck. That is the behaviour you want: Claude runs LaTeX,
+Python, and git without interrupting you, and only pauses before something risky.
+But Claude Code reads `settings.json` once, at session start, so it does not take
+effect until your *next* session. That is why the four install commands in this very
+first session ask for permission. Approve them; from the next session on, routine
 commands won't prompt you again.
 
 This works because Claude Code can read a GitHub repository, run shell commands, and
@@ -541,7 +541,7 @@ Example:
 ```
 ## Skills
 - /latex-compile — compile workbook.tex or brief.tex, fix errors and overfull boxes.
-- /sync-condensed — propagate new results from workbook.tex to brief.tex.
+- /sync-brief — propagate new results from workbook.tex to brief.tex.
 - /verify-residue — check a specific residue computation against the formula.
 ```
 
@@ -815,7 +815,7 @@ minutes and saves the result from being lost in workbook.tex.
 fix it immediately. A wrong brief.tex is worse than no brief.tex —
 Claude will confidently work from incorrect information.
 
-The `/sync-condensed` skill in this repository automates part of this: it classifies
+The `/sync-brief` skill in this repository automates part of this: it classifies
 which changes in workbook.tex are "load-bearing" (new theorems, corrected formulas)
 and prompts you to propagate them.
 
@@ -1498,10 +1498,13 @@ For a research project, constantly approving routine commands (compile, git stat
 run the computation script) is friction that adds up. The permissions block in
 `settings.json` lets you pre-approve what Claude can run.
 
-The most practical approach for research is **three tiers**: allow everything by
-default, *ask* before recoverable-but-risky commands, and *deny* the catastrophic
-ones outright. Precedence is `deny` > `ask` > `allow`, so a command listed under
-`ask` still prompts even though `allow` also matches it.
+The most practical approach for research is **allow everything by default, and
+*ask* before anything dangerous — block nothing outright**. Precedence is
+`deny` > `ask` > `allow`, so a command listed under `ask` still prompts even though
+`allow` also matches it. The `deny` list is left empty: nothing is ever hard-blocked,
+because a hard block is more annoying than useful — the moment you legitimately need
+a denied command you have to stop and edit `settings.json` mid-session. With `ask`,
+Claude simply pauses and you say "yes, this one" (or no) in the moment.
 
 ```json
 "permissions": {
@@ -1519,30 +1522,26 @@ ones outright. Precedence is `deny` > `ask` > `allow`, so a command listed under
     "Bash(dd *)",
     "Bash(truncate *)",
     "Bash(find* -delete*)",
-    "Bash(find* -exec rm*)"
-  ],
-  "deny": [
+    "Bash(find* -exec rm*)",
     "Bash(sudo*)",
     "Bash(mkfs*)",
     "Bash(fdisk*)",
     "Bash(shred*)"
-  ]
+  ],
+  "deny": []
 }
 ```
 
 `"allow": ["Bash"]` approves all shell commands by default — no more permission
-prompts for compiling LaTeX, running Python, or using git. The `ask` tier is the
-useful middle ground: commands like `rm`, `mv`, and `git reset --hard` are things
-you sometimes genuinely want, so instead of blocking them, Claude pauses and asks —
-you approve inline when you mean it, and nothing irreversible-ish happens by
-surprise. The `deny` tier is reserved for the truly catastrophic (privilege
-escalation, reformatting a disk) that should never run without you typing it yourself.
+prompts for compiling LaTeX, running Python, or using git. The `ask` list names
+everything that should give you pause — deletions, history-rewriting git commands,
+privilege escalation, disk operations — so Claude stops and asks before running any
+of them, but you can always approve inline when you mean it. Nothing is blocked, so
+you never have to leave your session to edit settings just to delete a stray file.
 
-> **Why an `ask` tier and not just `deny`?** An earlier version of this guide put
-> `rm` and `git reset --hard` in `deny`. That is safe but annoying: the moment you
-> legitimately need to delete a stray file, a hard `deny` forces you to edit
-> `settings.json` mid-session. `ask` keeps the safety net while letting you say
-> "yes, this one" in the moment.
+> **Want a true hard block?** Move a pattern into `deny` and it will be refused
+> outright, with no prompt — useful if there is a command you want to be *certain*
+> never runs (e.g. `Bash(sudo rm*)`). By default the starter keeps `deny` empty.
 
 The starter package [`starter/.claude/settings.json`](starter/.claude/settings.json)
 uses exactly this configuration. Copy it rather than writing your own from scratch.
@@ -1895,13 +1894,13 @@ starter/
 ├── brief.tex                        ← condensed-reference stub (overwrite if you have one)
 ├── .gitignore                       ← ignores Overleaf clone, LaTeX/Python artifacts
 └── .claude/
-    ├── settings.json                ← permissions (allow / ask / deny) + hooks
+    ├── settings.json                ← permissions (allow routine · ask before dangerous) + hooks
     ├── hooks/
     │   ├── pre-compact.sh           ← auto-save before context compression
     │   └── promise-checker.sh       ← Stop hook: catches "I'll remember" without a write
     └── skills/
         ├── latex-compile.md         ← /latex-compile skill
-        ├── sync-condensed.md        ← /sync-condensed skill
+        ├── sync-brief.md            ← /sync-brief skill
         ├── nb-to-wolfbook.md        ← /nb-to-wolfbook skill
         ├── verify-citation.md       ← /verify-citation skill
         ├── reality-check.md         ← /reality-check skill
@@ -1924,10 +1923,10 @@ in Part I.
 | [`starter/workbook.tex`](starter/workbook.tex) | LaTeX stub for the working record: preamble, theorem environments, skeleton sections — the research journal where proofs, derivations, and discussions live |
 | [`starter/brief.tex`](starter/brief.tex) | Condensed-reference stub with status tags (ESTABLISHED/CONJECTURED/OPEN) and cross-reference structure — fill in as results accumulate |
 | [`starter/.gitignore`](starter/.gitignore) | Ignore rules: Overleaf clone, LaTeX build artifacts, Python/Wolfram scratch, generated outputs |
-| [`starter/.claude/settings.json`](starter/.claude/settings.json) | Annotated generic settings: three-tier permissions (allow / ask / deny) + hooks for pre-compact, dual-remote push, and promise-checker |
+| [`starter/.claude/settings.json`](starter/.claude/settings.json) | Annotated generic settings: permissions that allow routine commands, ask before anything dangerous, and block nothing by default + hooks for pre-compact, dual-remote push, and promise-checker |
 | [`starter/.claude/hooks/pre-compact.sh`](starter/.claude/hooks/pre-compact.sh) | Pre-compact hook: timestamps CLAUDE.md and snapshots the task log before context compression |
 | [`starter/.claude/skills/latex-compile.md`](starter/.claude/skills/latex-compile.md) | Skill: compile LaTeX, fix common errors, report result |
-| [`starter/.claude/skills/sync-condensed.md`](starter/.claude/skills/sync-condensed.md) | Skill: propagate load-bearing changes from workbook.tex to brief.tex |
+| [`starter/.claude/skills/sync-brief.md`](starter/.claude/skills/sync-brief.md) | Skill: propagate load-bearing changes from workbook.tex to brief.tex |
 | [`starter/.claude/skills/nb-to-wolfbook.md`](starter/.claude/skills/nb-to-wolfbook.md) | Skill: convert .nb notebooks and .m scripts to Wolfbook's .wb format |
 | [`starter/.claude/skills/verify-citation.md`](starter/.claude/skills/verify-citation.md) | Skill: verify a paper exists on Semantic Scholar / arXiv before writing it as a citation |
 | [`starter/.claude/skills/reality-check.md`](starter/.claude/skills/reality-check.md) | Skill: re-derive a contested result in isolation to detect sycophantic capitulation |

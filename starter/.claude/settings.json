@@ -2,12 +2,12 @@
   "_comment": "Generic Claude Code settings for a research project. Copy to your project's .claude/settings.json and adapt.",
 
   "permissions": {
-    "_comment_precedence": "Three tiers. Precedence: deny > ask > allow. So a command matched by 'ask' prompts even though 'allow' also matches it, and a 'deny' command is blocked outright.",
+    "_comment_precedence": "Precedence: deny > ask > allow. We never hard-BLOCK anything — every dangerous command is in 'ask' so Claude pauses and you approve (or refuse) in the moment. 'deny' is left empty by default; add a command there only if you want it blocked outright with no prompt.",
 
     "_comment_allow": "Allow all Bash commands by default — no prompt for ordinary work: compile LaTeX, run Python/wolframscript, git, install packages, any standard research tool.",
     "allow": ["Bash"],
 
-    "_comment_ask": "Recoverable-but-dangerous: PROMPT for confirmation instead of running silently. You can still approve inline when you really mean it (e.g. an intentional 'rm'), but nothing here happens by surprise. This is the safety tier that catches Claude before an irreversible-ish action.",
+    "_comment_ask": "Dangerous-but-sometimes-wanted: PROMPT for confirmation instead of running silently. Nothing here is blocked — you can always approve inline when you really mean it (e.g. an intentional 'rm'). This is the safety net that catches Claude before an irreversible action without ever standing in your way.",
     "ask": [
       "Bash(rm *)",
       "Bash(rmdir *)",
@@ -21,16 +21,15 @@
       "Bash(dd *)",
       "Bash(truncate *)",
       "Bash(find* -delete*)",
-      "Bash(find* -exec rm*)"
-    ],
-
-    "_comment_deny": "Catastrophic / system-destroying: never run without explicit user instruction. 'deny' overrides everything.",
-    "deny": [
+      "Bash(find* -exec rm*)",
       "Bash(sudo*)",
       "Bash(mkfs*)",
       "Bash(fdisk*)",
       "Bash(shred*)"
-    ]
+    ],
+
+    "_comment_deny": "Empty by default: nothing is hard-blocked. If you ever want a command refused outright with no prompt, add it here ('deny' overrides 'ask' and 'allow').",
+    "deny": []
   },
 
   "hooks": {

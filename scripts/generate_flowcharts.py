@@ -99,7 +99,7 @@ def chart_setup():
     nd(g, 'nsp',    'Write next-session-prompts.md\n'
                     'first task at top · DONE log at bottom',      S_PROC)
     nd(g, 'sett',   'Configure .claude/settings.json\n'
-                    'allow routine · ask before risky · deny destructive\n'
+                    'allow routine · ask before anything dangerous\n'
                     'add pre-compact hook · test in terminal first', S_PROC)
     nd(g, 'ddual',  'Dual\nremotes?',                              S_DEC)
     nd(g, 'dual',   'Add GitHub + GitLab remotes\n'

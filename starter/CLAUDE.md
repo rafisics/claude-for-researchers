@@ -84,7 +84,7 @@ script. Never include `generated/` content in workbook.tex without my explicit i
 
 - `/latex-compile` — compile workbook.tex or brief.tex, fix errors and overfull boxes.
   Use after any edit to a .tex file.
-- `/sync-condensed` — propagate load-bearing changes from workbook.tex to brief.tex.
+- `/sync-brief` — propagate load-bearing changes from workbook.tex to brief.tex.
   Use after establishing a new result.
 - `/nb-to-wolfbook` — convert .nb notebooks or .m scripts to Wolfbook's .wb format.
   Use when migrating existing Mathematica files to work in VS Code with Wolfbook.

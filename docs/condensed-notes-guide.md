@@ -83,7 +83,7 @@ Two situations require a sync:
    immediately. A wrong `brief.tex` is worse than no `brief.tex` — Claude will
    confidently work from incorrect information.
 
-The `/sync-condensed` skill automates part of this: it identifies which changes
+The `/sync-brief` skill automates part of this: it identifies which changes
 in `workbook.tex` are "load-bearing" (new theorems, corrected formulas) and
 prompts you to propagate them.
 
