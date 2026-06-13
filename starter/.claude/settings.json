@@ -48,19 +48,8 @@
       }
     ],
 
-    "PostToolUse": [
-      {
-        "_comment": "After pushing to GitHub, automatically mirror to GitLab. Adjust matcher to your primary remote name. Remove this hook if you only have one remote.",
-        "matcher": "Bash(git push github*)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash scripts/git-push-both.sh 2>/dev/null || true",
-            "timeout": 60
-          }
-        ]
-      }
-    ],
+    "_comment_posttooluse": "OPT-IN dual-remote mirror, OFF by default — only relevant if you push to two remotes (e.g. personal GitHub + institution GitLab). Shipping it active would fail silently for single-remote users, so it is empty here. To enable: (1) configure scripts/git-push-both.sh (shipped in this starter) with your remotes and identities, (2) replace the empty array below with: [ { \"matcher\": \"Bash(git push github*)\", \"hooks\": [ { \"type\": \"command\", \"command\": \"bash scripts/git-push-both.sh 2>/dev/null || true\", \"timeout\": 60 } ] } ] — and match the matcher to your primary remote's name.",
+    "PostToolUse": [],
 
     "Stop": [
       {

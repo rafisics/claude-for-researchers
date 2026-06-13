@@ -58,6 +58,17 @@ First tagged release of the current structure. Everything below landed this mont
   nothing outright — so Claude never stalls but always pauses before a risky action.
 - Templates consolidated into `starter/` (the old `examples/` folder was retired);
   the `sync-condensed` skill was renamed `sync-brief`.
+- The **dual-remote mirror hook is now opt-in** (off by default). It was a silent
+  trap before — see Fixed.
+
+### Fixed
+- **Silent dual-remote mirror hook.** The starter's `settings.json` shipped an
+  *active* `PostToolUse` hook running `scripts/git-push-both.sh`, but the starter
+  didn't include that script — so a copied project appeared to mirror pushes to a
+  second remote (e.g. institution GitLab) while silently doing nothing. The hook now
+  ships **off** (empty `PostToolUse`), the `git-push-both.sh` template is included
+  under `starter/scripts/`, and both bootstrap routes enable it only if you say you
+  use two remotes, with the exact block to paste documented in `settings.json`.
 
 ### Clarified
 - The opening of the guide now states its scope explicitly: this is a workspace and

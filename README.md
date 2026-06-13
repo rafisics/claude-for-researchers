@@ -277,6 +277,13 @@ soften it.
 > `numerics/generated/` and `figures/generated/` — the CLAUDE.md you generate
 > below explains their role (AI-produced outputs pending my review).
 >
+> Only if I told you I push to two git remotes (e.g. personal GitHub + institution
+> GitLab): copy `starter/scripts/git-push-both.sh` to `scripts/`, and enable the
+> dual-remote mirror hook by replacing the empty `PostToolUse` array in
+> `.claude/settings.json` with the block documented in that file's
+> `_comment_posttooluse`. Do NOT enable it for a single-remote project — it would
+> fail silently. (The hook ships OFF by default for exactly that reason.)
+>
 > **Generate these from what I told you at the start of this session.** All four
 > files below must be customised to THIS project. Use the starter files ONLY for
 > their structure — preamble, macros, section layout, comment style — and replace
@@ -1727,6 +1734,13 @@ under a different identity.
 }]
 ```
 
+In the starter, this hook ships **off** (`PostToolUse` is an empty array) precisely
+because of the silent-failure point below: a mirror hook pointing at a script you
+have not configured, or a second remote you do not have, would fail quietly and you
+would believe your work was backed up when it was not. The starter includes the
+`scripts/git-push-both.sh` template and the exact block to paste — turn it on only
+once you have two remotes and have configured the script.
+
 ### Important: hooks run silently
 
 A hook that fails silently causes real problems — you think something happened when
@@ -2039,8 +2053,10 @@ starter/
 ├── workbook.tex                     ← LaTeX stub for the working record (overwrite if you have one)
 ├── brief.tex                        ← condensed-reference stub (overwrite if you have one)
 ├── .gitignore                       ← ignores Overleaf clone, LaTeX/Python artifacts
+├── scripts/
+│   └── git-push-both.sh             ← (opt-in) dual-remote push; enable via the PostToolUse hook
 └── .claude/
-    ├── settings.json                ← permissions (allow routine · ask before dangerous) + hooks
+    ├── settings.json                ← permissions (allow routine · ask before dangerous) + hooks (mirror hook OFF by default)
     ├── hooks/
     │   ├── pre-compact.sh           ← auto-save before context compression
     │   └── promise-checker.sh       ← Stop hook: catches "I'll remember" without a write

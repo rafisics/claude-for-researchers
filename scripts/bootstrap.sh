@@ -93,6 +93,8 @@ yesno "Will you cite literature (bibliography)?" y          && CITE=1    || CITE
 yesno "Install validation skills (reality-check, cross-validate)? Recommended when Claude does derivations." y \
                                                             && VALID=1   || VALID=0
 yesno "Is this paired with a SHARED Overleaf project?" n    && OVERLEAF=1 || OVERLEAF=0
+yesno "Do you push to TWO git remotes (e.g. personal GitHub + institution GitLab)?" n \
+                                                            && DUALREMOTE=1 || DUALREMOTE=0
 
 say ""
 say "Core files (universal — every project gets these):"
@@ -128,6 +130,15 @@ case $NUMERICS in mathematica|both) skill nb-to-wolfbook; skill sync-wb-nb sync-
 if [ "$NUMERICS" != "none" ]; then
     mkdir -p numerics/generated figures/generated
     say "  ok   numerics/generated/ and figures/generated/ (AI-output staging — see CLAUDE.md)"
+fi
+
+if [ "$DUALREMOTE" -eq 1 ]; then
+    mkdir -p scripts
+    core starter/scripts/git-push-both.sh scripts/git-push-both.sh
+    chmod +x scripts/git-push-both.sh 2>/dev/null
+    say "  -> dual remotes: edit scripts/git-push-both.sh (set your remotes + identities),"
+    say "     then enable the PostToolUse mirror hook in .claude/settings.json"
+    say "     (the exact block to paste is documented in that file)."
 fi
 
 if [ ! -d .git ]; then
