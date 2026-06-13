@@ -1479,12 +1479,15 @@ a Mathematica notebook — you write cells, evaluate them, see output inline.
 
 **For existing `.nb` notebooks and `.m` scripts:** use the `/nb-to-wolfbook` skill
 included in the starter package. Run `/nb-to-wolfbook <file>` (or point it at a
-directory to convert everything at once). The skill tries wolframscript first — if
-that is available it exports the notebook content directly; otherwise it falls back
-to [mathematica2jupyter](https://github.com/divenex/mathematica2jupyter). Output
-cells (computed results) are not preserved in the conversion — re-run the cells
-after opening the `.wb` file in VS Code. Graphics-heavy notebooks may need minor
-manual cleanup. Convert once, then work in `.wb` going forward.
+directory to convert everything at once). With wolframscript available it reads the
+notebook through Mathematica's own front end, so comments and special characters
+survive; without it, you save the notebook as a Package (.m) from Mathematica and
+the skill converts that. Either way it makes every cell **bridge-safe** — putting
+each statement on a single line — which matters because the tool that runs cells
+from VS Code splits them on line breaks, and a statement wrapped across several
+lines would otherwise be silently mis-evaluated (a dropped factor, a definition
+turned into a product) without any error. Output cells are not preserved — re-run
+them after opening the `.wb`. Convert once, then work in `.wb` going forward.
 
 **If your collaborators use Mathematica desktop**, you can keep a paired `.nb` file
 in sync automatically. The `/sync-wb-nb` skill (included in the starter) propagates
@@ -2017,8 +2020,8 @@ starter/
     └── skills/
         ├── latex-compile/SKILL.md   ← /latex-compile skill
         ├── sync-brief/SKILL.md      ← /sync-brief skill
-        ├── nb-to-wolfbook/SKILL.md  ← /nb-to-wolfbook skill
-        ├── sync-wb-nb/SKILL.md      ← /sync-wb-nb skill
+        ├── nb-to-wolfbook/          ← /nb-to-wolfbook skill (SKILL.md + nb2wb.py, nb2wb_extract.wls, wl_normalize.py)
+        ├── sync-wb-nb/              ← /sync-wb-nb skill (SKILL.md + sync-wb-nb.wls)
         ├── verify-citation/SKILL.md ← /verify-citation skill
         ├── reality-check/SKILL.md   ← /reality-check skill
         ├── cross-validate/SKILL.md  ← /cross-validate skill
@@ -2044,7 +2047,7 @@ in Part I.
 | [`starter/.claude/hooks/pre-compact.sh`](starter/.claude/hooks/pre-compact.sh) | Pre-compact hook: timestamps CLAUDE.md and snapshots the task log before context compression |
 | [`starter/.claude/skills/latex-compile/SKILL.md`](starter/.claude/skills/latex-compile/SKILL.md) | Skill: compile LaTeX, fix common errors, report result |
 | [`starter/.claude/skills/sync-brief/SKILL.md`](starter/.claude/skills/sync-brief/SKILL.md) | Skill: propagate load-bearing changes from workbook.tex to brief.tex |
-| [`starter/.claude/skills/nb-to-wolfbook/SKILL.md`](starter/.claude/skills/nb-to-wolfbook/SKILL.md) | Skill: convert .nb notebooks and .m scripts to Wolfbook's .wb format |
+| [`starter/.claude/skills/nb-to-wolfbook/SKILL.md`](starter/.claude/skills/nb-to-wolfbook/SKILL.md) | Skill: convert .nb notebooks and .m scripts to Wolfbook's .wb format, made bridge-safe (each statement on one line, so the MCP evaluates them faithfully). Ships helper scripts `nb2wb.py`, `nb2wb_extract.wls`, `wl_normalize.py` |
 | [`starter/.claude/skills/sync-wb-nb/SKILL.md`](starter/.claude/skills/sync-wb-nb/SKILL.md) | Skill: propagate .wb edits into the paired .nb, keeping it in sync for Mathematica collaborators |
 | [`starter/.claude/skills/verify-citation/SKILL.md`](starter/.claude/skills/verify-citation/SKILL.md) | Skill: verify a paper exists on Semantic Scholar / arXiv before writing it as a citation |
 | [`starter/.claude/skills/reality-check/SKILL.md`](starter/.claude/skills/reality-check/SKILL.md) | Skill: re-derive a contested result in isolation to detect sycophantic capitulation |

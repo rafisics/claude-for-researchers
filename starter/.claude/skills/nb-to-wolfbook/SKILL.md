@@ -1,119 +1,95 @@
+---
+name: nb-to-wolfbook
+description: "Convert Mathematica .nb or .m files to Wolfbook .wb format so they open and run in VS Code. Use when bringing existing .nb/.m files into Wolfbook, or to make an existing .wb bridge-safe."
+---
+
 # nb-to-wolfbook
 
-Converts existing Mathematica files (.nb notebooks or .m scripts) to Wolfbook format
-(.wb) so they can be opened and run inside VS Code with the Wolfbook extension.
+Converts Mathematica files (.nb / .m) to Wolfbook `.wb` (a VS Code Notebook JSON),
+and — critically — makes the resulting cells **bridge-safe** so they evaluate
+identically through the Wolfbook MCP (`runCell` / `evaluateExpression`) as they do
+in the Mathematica front end.
 
 ## When to invoke
-`/nb-to-wolfbook <file-or-directory>`
+`/nb-to-wolfbook <file-or-directory>`  — convert .nb/.m to .wb.
+`/nb-to-wolfbook --fix-wb <file.wb>`   — normalize an EXISTING .wb in place (bridge-safe), backup written.
 
-Use when the user has existing .nb or .m files and wants to work with them in Wolfbook.
-Accepts a single file or a directory — if given a directory, convert all .nb and .m
-files found in it (non-recursively).
+## ⚠️ The bug this skill exists to prevent (READ THIS)
 
-## Background: the .wb format
+A Wolfram cell can wrap **one statement over several physical lines**:
 
-Wolfbook .wb files are plain-text JSON following VS Code's Notebook API. The structure:
-
-```json
-{
- "cells": [
-  {
-   "kind": 2,
-   "languageId": "wolfram",
-   "value": "f[x_] := x^2",
-   "metadata": {},
-   "outputs": []
-  },
-  {
-   "kind": 1,
-   "languageId": "markdown",
-   "value": "# Section heading or prose note",
-   "metadata": {},
-   "outputs": []
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "displayName": "Wolfram Language",
-   "language": "wolfram",
-   "name": "wolfram"
-  }
- }
-}
+```
+Eeqv[{j1_},{k1_}] := (-1)^(j1) j1!/(k1-1) Coefficient[
+   GenSer, ep[j1,k1]];
+MMVbar[j_,k_] := (-1)^(Total[j]+Length[j])
+   MMV[j,k];
 ```
 
-Rules:
-- `kind: 2` = Wolfram code cell; `kind: 1` = Markdown text cell
-- `languageId` (NOT `language`) is REQUIRED on every cell — VS Code builds each cell
-  as a `vscode.NotebookCellData` and rejects the file with "NotebookCellData MUST have
-  'languageId' property" if it is missing. Use `"wolfram"` for code, `"markdown"` for
-  text. (The Wolfbook serializer passes the parsed JSON straight through to VS Code,
-  so the on-disk keys must match `vscode.NotebookData`/`NotebookCellData` exactly.)
-- Use exactly 1-space indentation throughout
-- `value` must be a valid JSON string: `\` → `\\`, `"` → `\"`, newlines → `\n`
-- `outputs: []` for all cells — outputs are not preserved, user will re-run
-- UTF-8 encoding
+The front end parses each cell as one unit, so this is fine *interactively*. But an
+evaluator that **splits a cell on newlines** (the Wolfbook MCP `runCell`, a headless
+`Get` of re-serialised text, naive `ToExpression`) sees broken fragments and either:
 
-**Always use Python's `json` module to write the file** — never build JSON strings
-manually. Use `json.dumps(data, indent=1, ensure_ascii=False)`.
+- throws `Syntax::sntxi: Incomplete expression` (the `Sum[...,⏎{...}]` case), or
+- treats the newline as **implicit `Times`**: `(-1)^k ⏎ MMV[...]` silently drops to a
+  product / loses the `MMV` factor, and `def1;⏎def2;` becomes `Times[def1;, def2;]`
+  instead of two definitions.
+
+This corrupts the kernel **silently** — definitions look present but are wrong — and is
+exactly what makes a cell-by-cell rebuild "unfaithful." The fix: put **each statement on
+one physical line**, collapsing only the *intra-statement* newlines (insignificant
+whitespace) and keeping a newline only after a top-level `;`. Semantics are unchanged,
+comments are preserved, and the cell is now safe for any evaluator.
+
+## Helper scripts (committed alongside this skill)
+
+- `wl_normalize.py` — the normalizer. `normalize(code)` collapses intra-statement
+  newlines; string/comment/bracket-aware. Also a CLI:
+  `python3 wl_normalize.py --wb <file.wb>` rewrites every wolfram code cell in place
+  (writes `<file>.wb.bak` first). Or pipe: `... | python3 wl_normalize.py`.
+- `nb2wb_extract.wls` — wolframscript extractor: reads a `.nb` and emits every cell in
+  order as **faithful InputText** via the front end (`FrontEnd`ExportPacket[..., "InputText"]`),
+  preserving comments and special characters. Avoids the old lossy "Package export + split
+  on blank lines," which destroyed cell boundaries.
+- `nb2wb.py` — the driver: runs the extractor, normalizes code cells, writes the `.wb`.
+
+## Steps for .nb files (preferred path — needs wolframscript)
+
+```bash
+python3 .claude/skills/nb-to-wolfbook/nb2wb.py "<file.nb>" ["<out.wb>"]
+```
+
+This produces a faithful, bridge-safe `.wb`. Report the printed summary line.
+
+If `wolframscript` is unavailable, fall back to: open the notebook in Mathematica,
+File → Save As → Package (.m), then use the `.m` steps below — but STILL run the
+normalizer on the result (see below), or the multi-line bug persists.
 
 ## Steps for .m files
 
-1. Read the file with the Read tool.
-2. Split into code blocks: runs of 2 or more consecutive blank lines mark cell
-   boundaries. Each contiguous block of non-blank lines becomes one cell.
-3. Identify section-header comments: if a block consists entirely of a comment like
-   `(* === Title === *)` or `(* Section: Residues *)`, make it a markdown cell
-   (`kind: 1`) with the comment text as the heading. All other blocks are code cells
-   (`kind: 2`).
-4. Write a short Python script that:
-   - Builds the cell list
-   - Writes `json.dumps(notebook, indent=1, ensure_ascii=False)` to `<basename>.wb`
-     in the same directory as the source file
-5. Run the script with the Bash tool.
-6. Report: `Created <basename>.wb — N code cells, M markdown cells.`
+1. Read the file.
+2. Split into cells: runs of ≥2 blank lines are cell boundaries; a block that is only a
+   `(* === Title === *)`-style comment becomes a markdown cell, others are code cells.
+3. **Normalize each code cell** with `wl_normalize.normalize` (bridge-safety — non-negotiable).
+4. Write the `.wb` with `json.dumps(notebook, indent=1, ensure_ascii=False)`.
 
-## Steps for .nb files
+## .wb format reminders
+- `kind: 2` = wolfram code cell (set `"languageId": "wolfram"`), `kind: 1` = markdown.
+- 1-space indent; `value` a valid JSON string; `outputs: []`; UTF-8.
+- Always build JSON with Python's `json` module, never by hand.
 
-The .nb format is proprietary. Try conversion paths in this order:
-
-**Path A — wolframscript available** (`which wolframscript` succeeds):
-1. Export the notebook as a package file:
-   ```bash
-   wolframscript -code 'Export["<basename>.m", Import["<abs-path>.nb", "Package"]]'
-   ```
-2. Convert the resulting .m file using the .m steps above.
-3. Note in the output: text/formatted cells were not preserved — only code survives
-   the Package export.
-
-**Path B — wolframscript not available, Python available**:
-1. Check for `mathematica2jupyter`: `pip show mathematica2jupyter 2>/dev/null`
-   - If absent: `pip install mathematica2jupyter`
-2. Convert: `python -m mathematica2jupyter <file.nb> <basename>.ipynb`
-3. Read the resulting .ipynb (JSON). For each cell where `cell_type == "code"`,
-   join the `source` list into a single string and create a `kind: 2` cell.
-   For `cell_type == "markdown"`, create a `kind: 1` cell.
-4. Write the .wb file.
-5. Note in the output: converted via mathematica2jupyter; output cells not preserved.
-
-**Path C — neither available**:
-Tell the user:
-> "Automatic .nb conversion requires either wolframscript (needs a Mathematica
-> licence) or Python with pip. You can also convert manually: open the notebook in
-> Mathematica desktop, go to File → Save As, choose 'Package (.m)', save it, then
-> run `/nb-to-wolfbook` on the resulting .m file."
-
-## Output format
-
-Report one line per file:
-
+## Making an existing .wb safe (no reconversion)
+```bash
+python3 .claude/skills/nb-to-wolfbook/wl_normalize.py --wb "numerics/your-notebook.wb"
 ```
-Converted: residues.nb  →  residues.wb   (14 code cells, wolframscript)
-Converted: helpers.m    →  helpers.wb    (6 code cells, 2 markdown cells)
+Normalizes every code cell in place (backup `.wb.bak`). Use this when a `.wb` already
+exists but mis-evaluates through the bridge.
 
-Note: output cells are not preserved — re-run cells in VS Code to regenerate results.
+## Verify after conversion
+Confirm no code cell still has a mid-statement line break (the bridge-unsafe pattern):
+```python
+def midline(v):  # any line ending in an operator / open bracket = continuation
+    return any(l.rstrip().endswith(('+','-','*','/','/.','->',':>',',','**','(','[','{','=','^','@','/;','&&','||')) for l in v.split('\n'))
+# expect 0 such code cells after normalize
 ```
-
-If any file could not be converted, say which one and why.
-If the notebook was heavily graphics-based, warn that some cells may need manual
-cleanup after opening.
+Output format: `Converted: <src> -> <dst> (N code cells, M markdown cells, bridge-safe).`
+If any file could not be converted, say which and why.
