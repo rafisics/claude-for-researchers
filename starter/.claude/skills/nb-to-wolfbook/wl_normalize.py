@@ -6,6 +6,41 @@ This makes cells safe for line-splitting evaluators (e.g. MCP runCell) and
 removes the newline-as-implicit-Times ambiguity, without changing semantics."""
 import sys, re
 
+def _strip_trailing(s: str) -> str:
+    """Drop trailing whitespace and trailing (* ... *) comments (possibly several,
+    possibly nested) so we can see the real last token of the line."""
+    i = len(s)
+    while True:
+        while i > 0 and s[i-1] in ' \t': i -= 1
+        if i >= 2 and s[i-2:i] == '*)':
+            depth = 1; i -= 2
+            while i > 0 and depth > 0:
+                if i >= 2 and s[i-2:i] == '*)': depth += 1; i -= 2
+                elif i >= 2 and s[i-2:i] == '(*': depth -= 1; i -= 2
+                else: i -= 1
+            continue
+        break
+    return s[:i]
+
+def _is_continuation(out) -> bool:
+    """True if the already-emitted current line ends mid-statement (the next
+    physical line continues it), so the intervening newline must be collapsed.
+    False if the line ends a complete statement (newline = statement boundary).
+    Trailing comments are ignored (the operator may sit just before a comment)."""
+    s = _strip_trailing(''.join(out))
+    if not s:
+        return False
+    c = s[-1]
+    c2 = s[-2] if len(s) >= 2 else ''
+    if c == ';':
+        return c2 == '/'          # '/;' Condition -> continuation; ';' -> statement end
+    if c == '&':
+        return c2 == '&'          # '&&' -> continuation; postfix '&' (Function) -> complete
+    if c == '.':
+        return not c2.isdigit()   # '/.' / Dot -> continuation; '2.' (a number) -> complete
+    # binary operators, comma, and open brackets all require more input:
+    return c in '+-*/^@<>=|~:,([{'
+
 def normalize(code: str) -> str:
     out = []
     depth = 0          # () [] {} nesting
@@ -15,6 +50,13 @@ def normalize(code: str) -> str:
     comment_depth = 0
     while i < n:
         c = code[i]
+        # Wolfram backslash line-continuation: '\' at end of a physical line joins
+        # to the next line with NO separator (used to split long numbers/strings,
+        # e.g. high-precision Λ values and *^-76 exponents). Must not insert a space.
+        if c == '\\' and i + 1 < n and code[i+1] in '\r\n':
+            i += 2
+            while i < n and code[i] in ' \t': i += 1
+            continue
         if in_str:
             out.append(c)
             if c == '\\' and i+1 < n:
@@ -31,24 +73,19 @@ def normalize(code: str) -> str:
         if c in '([{': depth += 1; out.append(c); i += 1; continue
         if c in ')]}': depth -= 1; out.append(c); i += 1; continue
         if c in '\r\n':
-            # find last non-space emitted char
-            j = len(out) - 1
-            while j >= 0 and out[j] in ' \t': j -= 1
-            last = out[j] if j >= 0 else ''
-            if depth == 0 and last == ';':
-                # statement boundary: keep a single newline
+            # Decide: is this newline a statement boundary (KEEP) or a
+            # mid-statement continuation (collapse to a space)?
+            #  - depth>0 (inside brackets)            -> continuation
+            #  - current line ends in a binary/operator/comma/opener -> continuation
+            #  - otherwise (complete statement)       -> boundary, keep newline
+            if depth == 0 and not _is_continuation(out):
                 while out and out[-1] in ' \t': out.pop()
                 out.append('\n')
-                # skip following whitespace/newlines
-                i += 1
-                while i < n and code[i] in ' \t\r\n': i += 1
-                continue
             else:
-                # mid-statement: collapse to a single space
                 if out and out[-1] not in ' \t\n': out.append(' ')
-                i += 1
-                while i < n and code[i] in ' \t\r\n': i += 1
-                continue
+            i += 1
+            while i < n and code[i] in ' \t\r\n': i += 1
+            continue
         out.append(c); i += 1
     # squeeze runs of spaces (outside strings already handled char-by-char; do a light pass)
     return ''.join(out)

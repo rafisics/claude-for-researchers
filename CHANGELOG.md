@@ -45,6 +45,10 @@ First tagged release of the current structure. Everything below landed this mont
 - **`nb-to-wolfbook`** rewritten to make every converted cell *bridge-safe*: each
   statement goes on one physical line, so the tool that runs cells from VS Code
   cannot silently mis-evaluate a statement that was wrapped across several lines.
+  The line-boundary detector handles the tricky Wolfram cases — postfix `&`
+  (`Function`) ends a statement while `&&` continues it, `/;` (`Condition`) and `/.`
+  continue, `2.` (a number) ends, and backslash-continued long numbers/strings
+  (e.g. high-precision values, `*^-76` exponents) re-join with no inserted space.
   Ships helper scripts (`nb2wb.py`, `nb2wb_extract.wls`, `wl_normalize.py`).
 - **Permissions model** in `starter/.claude/settings.json`: allow routine commands,
   *ask* before anything dangerous (including `sudo`/`mkfs`/`fdisk`/`shred`), block
