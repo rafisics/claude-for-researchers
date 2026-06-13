@@ -15,6 +15,10 @@ workflow so that *you* can do the research faster and more cleanly: less time on
 housekeeping, better continuity across sessions, fewer mistakes from working in a big
 messy codebase. Claude is the tool; you are the researcher.
 
+**Version 2026.06** — see [CHANGELOG.md](CHANGELOG.md) for recent updates. If you
+set up a project from an earlier copy, the changelog tells you what is worth
+re-copying from `starter/`.
+
 ---
 
 ## How to read this guide
