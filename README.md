@@ -1764,9 +1764,15 @@ rtk only applies to bash commands (the `Bash` tool). Claude Code's built-in
 `Read`, `Grep`, and `Glob` tools bypass rtk and are already efficient. The savings
 come from the chatty commands: git operations, test runners, linters, file listings.
 
-rtk does not change results — only how they are formatted before Claude sees them.
-If you ever want to see the raw output yourself, run the command directly in a
-terminal.
+rtk is *designed* not to change results — only how they are formatted before Claude
+sees them — and for git, test runners, and file listings that holds up well. But a
+filter can have bugs, so verify the ones you lean on. As of this writing rtk's
+`grep` filter is unreliable: it can report "N matches in 0 files" and drop the
+matching lines entirely, leaving Claude with no usable result. So do not rely on
+`grep` through rtk — use Claude Code's built-in **Grep tool** for searching (it
+bypasses rtk anyway), or exclude grep from rtk: run `rtk config --create`, then add
+`"grep"` to `exclude_commands` under `[hooks]`. If any filtered result ever looks
+wrong, run the command directly in a terminal to see the raw output.
 
 ### Token savings in practice
 
@@ -1776,7 +1782,6 @@ terminal.
 | `git diff` (medium file) | ~10,000 | ~2,500 | −75% |
 | `git log` | ~2,500 | ~500 | −80% |
 | `pytest` (full suite) | ~8,000 | ~800 | −90% |
-| `grep` result | ~16,000 | ~3,200 | −80% |
 
 Across a 30-minute session on a medium-sized project, the total saving is typically
 around 80%. On a long research session with many git operations and test runs, the
