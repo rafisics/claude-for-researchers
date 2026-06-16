@@ -37,7 +37,9 @@ First tagged release of the current structure. Everything below landed this mont
   Wolfbook's cell evaluator — a `(* ... *)` comment right after an operator (`x :=(*note*)`
   with the RHS on the next line) hid the operator from the line-splitter, tearing one
   statement into two broken inputs (`Syntax::sntxi` + a bogus orphan evaluation). Idempotent,
-  backs up, `--revert`able. See [`docs/wolfbook-comment-split-fix.md`](docs/wolfbook-comment-split-fix.md).
+  backs up, `--revert`able. Both bootstrap routes surface a zero-clone one-line installer
+  (`curl … | python3 -`) for Mathematica projects. See
+  [`docs/wolfbook-comment-split-fix.md`](docs/wolfbook-comment-split-fix.md).
 - **Context-monitoring note** in the session-length section: the read-only `/context`
   (what's filling the window) and `/usage` (where tokens/cost go) commands, plus a rule
   of thumb — glance at ~50%, act by ~70%, don't wait for auto-compaction, and for

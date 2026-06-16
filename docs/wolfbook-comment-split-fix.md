@@ -54,6 +54,14 @@ continuation operator. This is a one-line change in the extension's compiled spl
 python3 scripts/patch-wolfbook-splitter.py
 ```
 
+If you set the project up with the bootstrap (and never cloned this repo), run it
+straight from GitHub instead — no file to download:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/Mexregkan/claude-for-researchers/main/scripts/patch-wolfbook-splitter.py | python3 -
+# add --dry-run to preview first, or --revert to undo
+```
+
 Then reload the VS Code window: `Cmd/Ctrl+Shift+P → "Developer: Reload Window"`.
 
 The script:

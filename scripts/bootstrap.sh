@@ -150,7 +150,9 @@ say ""
 say "Optional one-time installs (run yourself if wanted):"
 say "  brew install rtk && rtk init -g --auto-patch    # token-saving output proxy"
 case $NUMERICS in mathematica|both)
-    say "  code --install-extension wolfbook.wolfbook      # Mathematica notebooks in VS Code" ;;
+    say "  code --install-extension wolfbook.wolfbook      # Mathematica notebooks in VS Code"
+    say "  # then fix Wolfbook's comment-split bug (safe: idempotent, backs up, --revert):"
+    say "  curl -fsSL $REPO_RAW/scripts/patch-wolfbook-splitter.py | python3 -   # reload VS Code after" ;;
 esac
 say "  mkdir -p ~/.claude/skills/pdf && curl -o ~/.claude/skills/pdf/SKILL.md \\"
 say "    https://raw.githubusercontent.com/anthropics/skills/main/skills/pdf/SKILL.md"

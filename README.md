@@ -319,6 +319,8 @@ soften it.
 > - `mkdir -p ~/.claude/skills/pdf && curl -o ~/.claude/skills/pdf/SKILL.md https://raw.githubusercontent.com/anthropics/skills/main/skills/pdf/SKILL.md`
 >   (skip if `~/.claude/skills/pdf/SKILL.md` already exists)
 > - `code --install-extension wolfbook.wolfbook` (only if I use Mathematica)
+> - `curl -fsSL https://raw.githubusercontent.com/Mexregkan/claude-for-researchers/main/scripts/patch-wolfbook-splitter.py | python3 -`
+>   (only if I use Mathematica — fixes Wolfbook's comment-split bug; reload the VS Code window after)
 > - `git init` (only if this is not already a git repo)
 
 **Step 5 — Approve the one-time install prompts.** Claude writes all the files
