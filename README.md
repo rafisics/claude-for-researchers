@@ -1544,6 +1544,17 @@ lines would otherwise be silently mis-evaluated (a dropped factor, a definition
 turned into a product) without any error. Output cells are not preserved — re-run
 them after opening the `.wb`. Convert once, then work in `.wb` going forward.
 
+**Optional: patch the splitter at the root.** The line-splitting above has a sharp
+edge — a `(* ... *)` comment placed right after an operator (e.g. `x :=(*note*)` with
+the right-hand side on the next line) hides the operator from the splitter, which then
+tears the statement in two and throws a confusing `Syntax::sntxi` plus a bogus
+evaluation of the orphaned half. Running `python3 scripts/patch-wolfbook-splitter.py`
+fixes this in the extension itself (idempotent, backs up, `--revert`able; reload the VS
+Code window afterward, and re-run after any Wolfbook update). See
+[`docs/wolfbook-comment-split-fix.md`](docs/wolfbook-comment-split-fix.md) for the full
+explanation and the manual one-line edit. The `/nb-to-wolfbook` skill already avoids the
+bug by putting each statement on one line; this patch is the belt-and-braces version.
+
 **If your collaborators use Mathematica desktop**, you can keep a paired `.nb` file
 in sync automatically. The `/sync-wb-nb` skill (included in the starter) propagates
 every edit you make in the `.wb` into the corresponding `.nb`, using a wolframscript
@@ -2126,6 +2137,8 @@ in Part I.
 | [`docs/condensed-notes-guide.md`](docs/condensed-notes-guide.md) | Detailed guide on what to include in and exclude from brief.tex |
 | [`scripts/git-push-both.sh`](scripts/git-push-both.sh) | Dual-remote push: push to GitHub (personal) and GitLab (institution) with separate identities |
 | [`scripts/readme-latex-check.sh`](scripts/readme-latex-check.sh) | Scan a README for LaTeX commands that GitHub's MathJax does not support |
+| [`scripts/patch-wolfbook-splitter.py`](scripts/patch-wolfbook-splitter.py) | Patch Wolfbook's cell splitter so a `(* … *)` comment after an operator can't tear a statement in two (idempotent, backs up, `--revert`/`--dry-run`) |
+| [`docs/wolfbook-comment-split-fix.md`](docs/wolfbook-comment-split-fix.md) | Full explanation of the Wolfbook comment-split bug and the patch (with the manual one-line edit) |
 
 ---
 

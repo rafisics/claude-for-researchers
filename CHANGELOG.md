@@ -33,6 +33,11 @@ First tagged release of the current structure. Everything below landed this mont
   a shared Overleaf project from its git remote.
 - **AI-output staging**: `numerics/generated/` and `figures/generated/` folders for
   Claude-produced outputs pending your review.
+- **Wolfbook splitter fix**: `scripts/patch-wolfbook-splitter.py` patches a sharp edge in
+  Wolfbook's cell evaluator — a `(* ... *)` comment right after an operator (`x :=(*note*)`
+  with the RHS on the next line) hid the operator from the line-splitter, tearing one
+  statement into two broken inputs (`Syntax::sntxi` + a bogus orphan evaluation). Idempotent,
+  backs up, `--revert`able. See [`docs/wolfbook-comment-split-fix.md`](docs/wolfbook-comment-split-fix.md).
 - **Context-monitoring note** in the session-length section: the read-only `/context`
   (what's filling the window) and `/usage` (where tokens/cost go) commands, plus a rule
   of thumb — glance at ~50%, act by ~70%, don't wait for auto-compaction, and for
