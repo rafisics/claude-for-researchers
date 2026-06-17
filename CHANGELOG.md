@@ -19,6 +19,13 @@ First tagged release of the current structure. Everything below landed this mont
   skills are flat files, move each `<name>.md` to `<name>/SKILL.md`.
 - The skills below were rewritten. If you copied earlier versions, re-copy them
   from `starter/.claude/skills/` to get the fixes.
+- **Re-copy `nb-to-wolfbook` and `sync-wb-nb`** (see the `nb-to-wolfbook` entry under
+  Fixed): an earlier copy can *silently drop a factor* from a display-wrapped
+  definition during `.nb` → `.wb` conversion. Re-copy both skill folders from
+  `starter/.claude/skills/`; if you installed `sync-wb-nb` globally, also replace
+  `~/.claude/skills/sync-wb-nb/`. Then run
+  `python3 .claude/skills/nb-to-wolfbook/wl_normalize.py --check <your.wb>` on existing
+  notebooks — the gap was latent, so a notebook converted earlier may already be wrong.
 
 ### Added
 - **Adaptive bootstrapping.** Both setup routes now install *by relevance* instead
@@ -71,6 +78,16 @@ First tagged release of the current structure. Everything below landed this mont
   trap before — see Fixed.
 
 ### Fixed
+- **`nb-to-wolfbook` could silently drop a factor from a display-wrapped definition.**
+  The bridge-safety detector decided line breaks by how a line *ended*. A wide
+  definition that the Mathematica front end *display-wrapped* onto an indented next
+  line ends in a complete value (e.g. `…)`), so the detector mistook the wrap for a
+  statement boundary, split the definition, and silently dropped the trailing factor —
+  no error, a wrong definition. `wl_normalize` now also treats a newline followed by a
+  *continuation indent* as a wrap (genuine statement breaks start at column 0), and
+  ships a hazard checker — `wl_normalize.py --check <file.wb>` (exit 1 on any
+  definition split across a top-level newline), run automatically by `nb2wb.py` and by
+  `sync-wb-nb regenerate` before it overwrites a `.nb`.
 - **Silent dual-remote mirror hook.** The starter's `settings.json` shipped an
   *active* `PostToolUse` hook running `scripts/git-push-both.sh`, but the starter
   didn't include that script — so a copied project appeared to mirror pushes to a

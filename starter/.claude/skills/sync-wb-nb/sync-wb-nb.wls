@@ -83,9 +83,26 @@ codeSpecs[v_] := Module[{comments, code, out = {}, ct},
    If[code =!= "", AppendTo[out, {"code", code}]];
    out];
 
-regenerate[wbfile_, nbfile_] := Module[{wb, specs, cells, nb2, nIn, nCode, raw, nbBoxes},
+regenerate[wbfile_, nbfile_] := Module[{wb, specs, cells, nb2, nIn, nCode, raw, nbBoxes, chk, checker},
    wb = Quiet[Import[wbfile, "RawJSON"]];
    If[Head[wb] =!= Association, die["cannot read .wb " <> wbfile]];
+   (* Guard: a split-statement hazard in the .wb (e.g. a definition RHS broken across a
+      top-level newline) would be faithfully propagated into the .nb as a corrupting
+      BoxData[{stmt1,"\n",stmt2}] split — this is how the MMVbar bug got into the .nb.
+      If the paired nb-to-wolfbook skill is present (it lives next to this script under
+      ../nb-to-wolfbook/), run its hazard checker and warn loudly before overwriting.
+      Path is derived from this script's own location, so it is portable; if the checker
+      is absent (e.g. a global-only sync-wb-nb install), this guard silently no-ops. *)
+   checker = Quiet@Check[
+      FileNameJoin[{DirectoryName[ExpandFileName[$ScriptCommandLine[[1]]]],
+                    "..", "nb-to-wolfbook", "wl_normalize.py"}], ""];
+   If[StringQ[checker] && checker =!= "" && FileExistsQ[checker],
+    chk = RunProcess[{"python3", checker, "--check", wbfile}];
+    If[AssociationQ[chk] && chk["ExitCode"] =!= 0,
+     Print["\n*** WARNING: split-statement hazard(s) in the .wb ***"];
+     Print[chk["StandardOutput"]];
+     Print["The regenerated .nb will INHERIT these (BoxData split). Fix the .wb first:"];
+     Print["  python3 ", checker, " --wb \"", wbfile, "\"   (then re-check). Proceeding.\n"]]];
    specs = Flatten[
      Function[c, If[c["kind"] === 1, mdSpecs[c["value"]], codeSpecs[c["value"]]]] /@ wb["cells"], 1];
    cells = Function[spec, Module[{bd},

@@ -14,9 +14,15 @@ Pipeline:
        - "Incomplete expression" on a single statement wrapped over many lines;
        - newline-as-implicit-Times turning `a:=...; \n b:=...` into Times[...] or
          dropping a trailing factor (`(-1)^k \n MMV[...]`).
-  3. Writes a VS Code Notebook .wb (JSON, indent=1).
+     The FE's InputText export ignores PageWidth and wraps wide cells with a
+     continuation INDENT after the newline; normalize() uses that indent as the
+     signal to collapse the wrap (a line ending in a complete value like `)` fools a
+     pure end-of-line-operator heuristic — that gap is what produced the MMVbar bug).
+  3. Runs wl_normalize.find_split_hazards on every code cell and warns about any
+     residual definition-split (belt-and-braces; should be empty after normalize).
+  4. Writes a VS Code Notebook .wb (JSON, indent=1).
 
-Run:  python3 nb2wb.py "numerical congruence(3).nb"
+Run:  python3 nb2wb.py "<file.nb>"
 """
 import json, os, subprocess, sys
 from importlib.machinery import SourceFileLoader
@@ -63,8 +69,16 @@ def main():
     with open(wb_path, "w", encoding="utf-8") as f:
         f.write(json.dumps(nb, indent=1, ensure_ascii=False))
     ncode = sum(1 for c in cells if c["kind"] == 2)
+    # belt-and-braces: report any residual statement-split hazard
+    haz = []
+    for c in cells:
+        if c["kind"] == 2:
+            haz += norm.find_split_hazards(c["value"])
+    suffix = "bridge-safe" if not haz else f"WARNING: {len(haz)} split hazard(s) — run --check"
     print(f"Converted: {os.path.basename(nb_path)} -> {os.path.basename(wb_path)} "
-          f"({ncode} code cells, {len(cells)-ncode} markdown cells, bridge-safe)")
+          f"({ncode} code cells, {len(cells)-ncode} markdown cells, {suffix})")
+    for a, b in haz[:10]:
+        print(f"  HAZARD: ...{a[-50:]!r}  +SPLIT+  {b[:50]!r}...")
 
 if __name__ == "__main__":
     main()
