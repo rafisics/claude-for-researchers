@@ -66,15 +66,19 @@ core() { # $1 = source rel path, $2 = destination — never overwrite
         fetch "$1" "$2" && say "  ok   $2"
     fi
 }
-skill() { # $1 = skill name [, $2 = companion filename]
+skill() { # $1 = skill name [, $2.. = companion files relative to the skill dir]
     if [ -f "$HOME/.claude/skills/$1/SKILL.md" ]; then
         say "  skip skill $1 (installed globally — available everywhere already)"
         return 0
     fi
-    mkdir -p ".claude/skills/$1"
-    fetch "starter/.claude/skills/$1/SKILL.md" ".claude/skills/$1/SKILL.md"
-    [ -n "$2" ] && fetch "starter/.claude/skills/$1/$2" ".claude/skills/$1/$2"
-    say "  ok   skill $1"
+    name=$1; shift
+    mkdir -p ".claude/skills/$name"
+    fetch "starter/.claude/skills/$name/SKILL.md" ".claude/skills/$name/SKILL.md"
+    for comp in "$@"; do   # companions may live in subdirs (e.g. scripts/foo.py)
+        mkdir -p ".claude/skills/$name/$(dirname "$comp")"
+        fetch "starter/.claude/skills/$name/$comp" ".claude/skills/$name/$comp"
+    done
+    say "  ok   skill $name"
 }
 
 say "== claude-for-researchers bootstrap =="
@@ -124,7 +128,11 @@ skill latex-compile
 skill sync-brief
 [ "$CITE" -eq 1 ]     && skill verify-citation
 if [ "$VALID" -eq 1 ]; then skill reality-check; skill cross-validate; fi
-case $NUMERICS in mathematica|both) skill nb-to-wolfbook; skill sync-wb-nb sync-wb-nb.wls ;; esac
+case $NUMERICS in mathematica|both)
+    skill nb-to-wolfbook nb2wb.py nb2wb_extract.wls wl_normalize.py
+    skill sync-wb-nb sync-wb-nb.wls
+    skill wolfram-headless scripts/greek2esc.py hooks/wolfram-license-notice.sh ;;
+esac
 [ "$OVERLEAF" -eq 1 ] && skill overleaf-sync
 
 if [ "$NUMERICS" != "none" ]; then

@@ -258,7 +258,8 @@ soften it.
 > - `verify-citation` — only if I will cite literature
 > - `reality-check`, `cross-validate` — if Claude will be doing derivations or
 >   calculations whose correctness matters (default: yes for research)
-> - `nb-to-wolfbook`, `sync-wb-nb` — only if I use Mathematica
+> - `nb-to-wolfbook`, `sync-wb-nb`, `wolfram-headless` — only if I use Mathematica
+>   (`wolfram-headless` also applies to any heavy headless `wolframscript` use)
 > - `overleaf-sync` — only if I mentioned a shared Overleaf project
 >
 > For each skill you selected, check `~/.claude/skills/<name>/SKILL.md` first:
@@ -1576,6 +1577,20 @@ notebooks whose outputs you want to preserve.
 Claude runs or modifies. Claude reads and edits `.m` files the same as Python
 scripts — no special handling needed.
 
+**Running heavy `wolframscript` jobs headless** has two traps that cost real time, and
+the `/wolfram-headless` skill (included in the starter) encodes the fixes. First, the
+error `The product exited because of a license error` is almost never about your
+licence — it is a mis-reported kernel **crash**, usually a memory spike from a huge
+symbolic intermediate; the skill walks through confirming the licence is fine and then
+shrinking the computation (substitute solved sub-results before the heavy step, chunk
+big products, set `$HistoryLength = 0`). Second, **literal Greek letters in a `.wls`
+file silently corrupt your symbols** — `wolframscript` reads the file under a non-UTF-8
+encoding, so a typed `ω` becomes a different, dead symbol with no error, and any pattern
+match against the real `\[Omega]` quietly fails; always write the ASCII escapes
+(`\[Omega]`, `\[Alpha]`, …), and the skill ships `greek2esc.py` to convert a file in one
+pass. An optional companion hook flags the misleading "license error" automatically; it
+ships off, like the other opt-in hooks (see [Hooks](#hooks)).
+
 ### Precision discipline
 
 Always state the precision explicitly:
@@ -2104,6 +2119,7 @@ starter/
         ├── sync-brief/SKILL.md      ← /sync-brief skill
         ├── nb-to-wolfbook/          ← /nb-to-wolfbook skill (SKILL.md + nb2wb.py, nb2wb_extract.wls, wl_normalize.py)
         ├── sync-wb-nb/              ← /sync-wb-nb skill (SKILL.md + sync-wb-nb.wls)
+        ├── wolfram-headless/        ← /wolfram-headless skill (SKILL.md + scripts/greek2esc.py, hooks/wolfram-license-notice.sh)
         ├── verify-citation/SKILL.md ← /verify-citation skill
         ├── reality-check/SKILL.md   ← /reality-check skill
         ├── cross-validate/SKILL.md  ← /cross-validate skill
@@ -2131,6 +2147,7 @@ in Part I.
 | [`starter/.claude/skills/sync-brief/SKILL.md`](starter/.claude/skills/sync-brief/SKILL.md) | Skill: propagate load-bearing changes from workbook.tex to brief.tex |
 | [`starter/.claude/skills/nb-to-wolfbook/SKILL.md`](starter/.claude/skills/nb-to-wolfbook/SKILL.md) | Skill: convert .nb notebooks and .m scripts to Wolfbook's .wb format, made bridge-safe (each statement on one line, so the MCP evaluates them faithfully). Ships helper scripts `nb2wb.py`, `nb2wb_extract.wls`, `wl_normalize.py` |
 | [`starter/.claude/skills/sync-wb-nb/SKILL.md`](starter/.claude/skills/sync-wb-nb/SKILL.md) | Skill: propagate .wb edits into the paired .nb, keeping it in sync for Mathematica collaborators |
+| [`starter/.claude/skills/wolfram-headless/SKILL.md`](starter/.claude/skills/wolfram-headless/SKILL.md) | Skill: run heavy headless `wolframscript` reliably — why "license error" usually means a memory crash, and why literal Greek in `.wls` silently corrupts symbols. Ships `scripts/greek2esc.py` and an opt-in `hooks/wolfram-license-notice.sh` |
 | [`starter/.claude/skills/verify-citation/SKILL.md`](starter/.claude/skills/verify-citation/SKILL.md) | Skill: verify a paper exists on Semantic Scholar / arXiv before writing it as a citation |
 | [`starter/.claude/skills/reality-check/SKILL.md`](starter/.claude/skills/reality-check/SKILL.md) | Skill: re-derive a contested result in isolation to detect sycophantic capitulation |
 | [`starter/.claude/skills/cross-validate/SKILL.md`](starter/.claude/skills/cross-validate/SKILL.md) | Skill: format a physics claim for cross-model validation against Gemini or ChatGPT |

@@ -52,6 +52,15 @@ First tagged release of the current structure. Everything below landed this mont
   of thumb — glance at ~50%, act by ~70%, don't wait for auto-compaction, and for
   research prefer a fresh session seeded from your documents over repeated (lossy)
   compaction.
+- **`wolfram-headless` skill** for reliable heavy headless `wolframscript`. It encodes
+  two hard-won lessons: (1) `The product exited because of a license error` is almost
+  always a mis-reported kernel **crash** (a memory spike), not a licensing problem — so
+  it shows how to confirm the licence then shrink the computation; and (2) literal Greek
+  in a `.wls` file **silently corrupts symbols** under `wolframscript`'s non-UTF-8 read,
+  so always use ASCII escapes (`\[Omega]` …). Ships `scripts/greek2esc.py` (convert a
+  file in one pass) and an opt-in `hooks/wolfram-license-notice.sh` that auto-flags the
+  misleading error. `scripts/bootstrap.sh` installs it for Mathematica/wolframscript
+  projects (and now fetches every skill's helper scripts, not just the SKILL.md).
 
 ### Changed
 - **`latex-compile`** rewritten: compiles with `pdflatex` and captures stdout
