@@ -33,8 +33,15 @@ bibliography needs a second pass to resolve `\cite`).
 ## 2. Collect ALL issues from the fresh stdout
 
 ```
-grep -anE "^! |LaTeX Error|Undefined|Overfull|Underfull|multiply defined|Font (shape|Warning)|File .*not found" /tmp/tex.txt
+grep -anE "^! |LaTeX Error|[Uu]ndefined|Overfull|Underfull|multiply defined|Font (shape|Warning)|File .*not found" /tmp/tex.txt
 ```
+
+**Case matters — this is the bug that lets `[?]`/`??` ship.** pdflatex writes `Undefined
+control sequence` (capital, a fatal error) but the broken-ref/cite *warnings* are lowercase:
+`Reference 'x' … undefined`, `Citation 'x' … undefined`, and the end-of-run summary `There
+were undefined references`/`Citation 'x' undefined`. A pattern of `Undefined` alone silently
+misses every one of those — so the PDF prints `??` for a dead `\ref` and `[?]` for a dead
+`\cite` while the grep reports nothing. The bracketed class `[Uu]ndefined` catches both.
 
 | Category | Marker | Threshold to fix |
 |---|---|---|
@@ -60,7 +67,16 @@ The `! …` line and the `l.<N>` line below it locate the fault.
 Recompile and repeat until the fatal grep is empty.
 
 ## 4. Undefined references and citations
+A dead `\ref` prints `??`; a dead `\cite` prints `[?]`. Resolve **every** one — the run is
+not clean while any `[Uu]ndefined` warning remains.
 - Label/cite exists in the document → just add a second compile pass.
+- **Key mismatch** (the common dead-`\cite`): the `\cite{key}` doesn't match any
+  `\bibitem{key}` (manual `thebibliography`) or `.bib` entry — usually a spelling/format
+  drift (e.g. `\cite{Author:2024xyz}` vs the defined `\bibitem{Author2024}`). Grep the
+  used vs. defined keys and reconcile:
+  `grep -oE "\\\\cite\{[^}]*\}" <file> | sort -u` against
+  `grep -oE "\\\\bibitem\{[^}]*\}" <file>` (or the `.bib` keys). Fix the `\cite` to the real
+  key (or add the missing entry) — never leave the mismatch.
 - Label exists only in a **different file** (cross-file `\ref`) → it can never resolve.
   Replace `\ref{label}` with the section/theorem title as literal text — e.g.
   ``\S\,``Title of that section''``. Never leave a dangling `\ref` that prints `??`.
@@ -122,6 +138,15 @@ headers to make things fit.** Fix overflow only by changing *layout*:
 Recompile with `pdflatex` (same `> /tmp/tex.txt` capture), re-run the §2 grep on the
 **fresh** stdout, and confirm: no `! ` errors, targeted overfulls gone or < 5pt, no new
 issues, refs/cites resolved.
+
+**Mandatory broken-ref gate — never report success while it fails.** On the fresh stdout,
+this must print `0`:
+```
+grep -acE "Reference .* undefined|Citation .* undefined|There were undefined" /tmp/tex.txt
+```
+A nonzero count means the PDF still prints `??`/`[?]` somewhere — go back to §4 and fix it
+before reporting. (Run the final pass twice first: refs/cites need a second pass to settle,
+so a leftover here is genuinely broken, not just stale.)
 
 ## 9. Report
 ```

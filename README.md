@@ -2143,7 +2143,7 @@ in Part I.
 | [`starter/.gitignore`](starter/.gitignore) | Ignore rules: Overleaf clone, LaTeX build artifacts, Python/Wolfram scratch, generated outputs |
 | [`starter/.claude/settings.json`](starter/.claude/settings.json) | Annotated generic settings: permissions that allow routine commands, ask before anything dangerous, and block nothing by default + hooks for pre-compact, dual-remote push, and promise-checker |
 | [`starter/.claude/hooks/pre-compact.sh`](starter/.claude/hooks/pre-compact.sh) | Pre-compact hook: timestamps CLAUDE.md and snapshots the task log before context compression |
-| [`starter/.claude/skills/latex-compile/SKILL.md`](starter/.claude/skills/latex-compile/SKILL.md) | Skill: compile LaTeX, fix common errors, report result |
+| [`starter/.claude/skills/latex-compile/SKILL.md`](starter/.claude/skills/latex-compile/SKILL.md) | Skill: compile LaTeX, fix every error and aesthetic issue (overfull boxes, fonts, widows), and gate on broken `\ref`/`\cite` so a dead reference (`??`/`[?]`) can't ship silently |
 | [`starter/.claude/skills/sync-brief/SKILL.md`](starter/.claude/skills/sync-brief/SKILL.md) | Skill: propagate load-bearing changes from workbook.tex to brief.tex |
 | [`starter/.claude/skills/nb-to-wolfbook/SKILL.md`](starter/.claude/skills/nb-to-wolfbook/SKILL.md) | Skill: convert .nb notebooks and .m scripts to Wolfbook's .wb format, made bridge-safe (each statement on one line, so the MCP evaluates them faithfully). Ships helper scripts `nb2wb.py`, `nb2wb_extract.wls`, `wl_normalize.py` |
 | [`starter/.claude/skills/sync-wb-nb/SKILL.md`](starter/.claude/skills/sync-wb-nb/SKILL.md) | Skill: propagate .wb edits into the paired .nb, keeping it in sync for Mathematica collaborators |

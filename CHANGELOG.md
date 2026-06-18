@@ -26,6 +26,10 @@ First tagged release of the current structure. Everything below landed this mont
   `~/.claude/skills/sync-wb-nb/`. Then run
   `python3 .claude/skills/nb-to-wolfbook/wl_normalize.py --check <your.wb>` on existing
   notebooks — the gap was latent, so a notebook converted earlier may already be wrong.
+- **Re-copy `latex-compile`** (see Changed): an earlier copy missed broken `\ref`/`\cite`
+  warnings, so a compile could report clean while the PDF printed `??`/`[?]`. Re-copy
+  `latex-compile` from `starter/.claude/skills/` (and replace `~/.claude/skills/latex-compile/`
+  if you installed it globally), then recompile and confirm the broken-ref gate is clean.
 
 ### Added
 - **Adaptive bootstrapping.** Both setup routes now install *by relevance* instead
@@ -67,6 +71,13 @@ First tagged release of the current structure. Everything below landed this mont
   (avoiding the `latexmk` stale-log trap), greps with `-a` (pdflatex embeds binary
   bytes that silently defeat plain grep), uses correct severity thresholds, and
   reformats rather than rewords when fixing overfull boxes.
+- **`latex-compile` now catches broken `\ref`/`\cite`.** The issue grep matched only
+  capital `Undefined` (the fatal *control sequence* error) and so missed the lowercase
+  broken-reference/citation *warnings* (`Reference 'x' … undefined`, `Citation 'x' …
+  undefined`) — meaning a dead `\ref` could ship as `??` and a dead `\cite` as `[?]`
+  while the run reported clean. The pattern is now `[Uu]ndefined`, plus key-mismatch
+  diagnosis (used vs. defined keys) and a **mandatory broken-ref gate** that must report
+  zero undefined refs/cites before the skill claims success.
 - **`sync-wb-nb`** gained a `regenerate` mode that rebuilds a whole `.nb` from its
   `.wb` with proper syntax colouring and section headings — for new or
   fully-rewritten notebooks, alongside the existing cell-by-cell sync.
