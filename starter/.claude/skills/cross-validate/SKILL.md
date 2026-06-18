@@ -1,3 +1,8 @@
+---
+name: cross-validate
+description: "Format a result, derivation, or numerical value for independent verification by a second model. Use when you want a cross-check on an important or contested result."
+---
+
 # /cross-validate
 
 Format a physics or mathematics claim for cross-model validation.
@@ -15,7 +20,7 @@ and the physics-specific failure modes documented by Tim Andersen
 ## Usage
 
 ```
-/cross-validate "the residue of ξ(2s)E(z,s) at s=1/2 is π"
+/cross-validate "the Gaussian integral sqrt(pi) follows from squaring and polar coordinates"
 /cross-validate  (no argument — validate the last substantial result)
 ```
 
@@ -29,10 +34,9 @@ Write the claim as a self-contained statement including:
 - The domain of validity or the specific input values
 
 Example:
-> Claim: For the completed Eisenstein series E*(z,s) = ξ(2s)E(z,s), where
-> ξ(s) = π^{-s/2} Γ(s/2) ζ(s), the residue at s = 1/2 is 3/π.
-> Check this using the functional equation E*(z,s) = E*(z,1-s) and the pole
-> structure of ξ(s).
+> Claim: The Gaussian integral I = ∫_{-∞}^{∞} e^{-x²} dx equals √π.
+> Check this by computing I² = ∫∫ e^{-(x²+y²)} dx dy in polar coordinates,
+> and confirm the radial integral gives π.
 
 **Step 2 — List the specific checkpoints.**
 Identify what a second model should verify. Focus on the known Claude weak spots:

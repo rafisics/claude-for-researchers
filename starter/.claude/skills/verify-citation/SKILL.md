@@ -1,3 +1,8 @@
+---
+name: verify-citation
+description: "Confirm a paper actually exists (arXiv / Semantic Scholar / OpenAlex) before citing it. Use before writing any new citation."
+---
+
 # /verify-citation
 
 Verify that a paper exists before writing it as a citation.

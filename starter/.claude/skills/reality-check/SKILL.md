@@ -1,3 +1,8 @@
+---
+name: reality-check
+description: "Re-derive a contested or pushed-back claim in isolation from the definitions, to catch sycophantic capitulation. Use when a result is disputed or you suspect you changed an answer only because the user pushed back."
+---
+
 # /reality-check
 
 Re-examine a contested claim in isolation to detect sycophantic capitulation.

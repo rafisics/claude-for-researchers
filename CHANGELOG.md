@@ -9,6 +9,21 @@ Versioning is calendar-based (`vYYYY.MM`): this is a guide and a copy-in starter
 pack, not a linked library, so there is no API to break — the version answers
 "how current is my copy?", nothing more.
 
+## v2026.06 — 2026-06-18 (update)
+
+### Fixed
+- **`verify-citation`, `reality-check`, `cross-validate` were missing their YAML frontmatter.**
+  Without the `---\nname: ...\ndescription: ...\n---` block, Claude Code silently does not
+  register these as slash commands — `/verify-citation` would not appear in the `/` menu and
+  could not be invoked. Re-copy all three `SKILL.md` files from `starter/.claude/skills/`.
+
+### Changed
+- **`cross-validate` example generalised.** The Step 1 worked example used an Eisenstein series
+  claim that was specific to one project. Replaced with a universally recognisable Gaussian
+  integral example so the format is clear to any researcher.
+
+---
+
 ## v2026.06 — 2026-06-13
 
 First tagged release of the current structure. Everything below landed this month.
