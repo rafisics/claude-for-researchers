@@ -33,4 +33,7 @@ numerics/img/
 
 # --- macOS / editor ---
 .DS_Store
-.vscode/
+# Ignore personal VS Code state, but DO track the shared word-wrap settings that ship
+# with this toolkit (notebook cells; see docs/wolfbook-notebook-ux.md).
+.vscode/*
+!.vscode/settings.json

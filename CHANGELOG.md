@@ -9,6 +9,35 @@ Versioning is calendar-based (`vYYYY.MM`): this is a guide and a copy-in starter
 pack, not a linked library, so there is no API to break — the version answers
 "how current is my copy?", nothing more.
 
+## v2026.06 — 2026-06-20 (update)
+
+### Added
+- **Notebook word wrap + Mathematica-style section folding for VS Code.** Two quality-of-life
+  fixes for working in `.wb` (and any) notebooks: long cell lines now *wrap* instead of
+  scrolling sideways, and you can *collapse a whole section* the way you double-click a section
+  bracket in Mathematica. Neither patches the Wolfbook extension — both configure VS Code
+  itself, so they survive extension updates. The non-obvious part the new guide explains:
+  wrapping notebook *cells only* (without also wrapping your `.tex`/`.py`/`.md` files) needs
+  `notebook.editorOptionsCustomizations` — the plain `editor.wordWrap` wraps every file, and the
+  language-scoped `"[wolfram]"` form doesn't reach cells at all. Word wrap now ships on by
+  default in the starter (`starter/.vscode/settings.json`); the new
+  `scripts/apply-notebook-ux.py` installer also adds the section-folding keybindings
+  (`Ctrl+Alt+[`/`]`, mac `⌥⌘[`/`]`), works across VS Code / Cursor / VSCodium / Windsurf, and
+  is idempotent with `--dry-run`/`--revert`. Both bootstrap routes install it for
+  Mathematica/notebook projects (a manual copy of all of `starter/` still gets it regardless).
+  See [`docs/wolfbook-notebook-ux.md`](docs/wolfbook-notebook-ux.md).
+
+### Action needed if you set up a project before this release
+- **To get word wrap as a tracked default, re-copy `starter/.gitignore` (or just add the two
+  lines).** Its `.vscode/` rule is now `.vscode/*` + `!.vscode/settings.json`, so the shared
+  word-wrap `settings.json` is tracked while personal VS Code state stays ignored. Then copy
+  `starter/.vscode/settings.json` into your project's `.vscode/`, or run
+  `curl -fsSL https://raw.githubusercontent.com/Mexregkan/claude-for-researchers/main/scripts/apply-notebook-ux.py | python3 -`
+  (which also installs the section-folding keybindings). This is optional — nothing breaks
+  without it; you just won't get word wrap until you do one of these.
+
+---
+
 ## v2026.06 — 2026-06-18 (update)
 
 ### Fixed

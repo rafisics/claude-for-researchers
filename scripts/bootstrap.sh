@@ -131,7 +131,9 @@ if [ "$VALID" -eq 1 ]; then skill reality-check; skill cross-validate; fi
 case $NUMERICS in mathematica|both)
     skill nb-to-wolfbook nb2wb.py nb2wb_extract.wls wl_normalize.py
     skill sync-wb-nb sync-wb-nb.wls
-    skill wolfram-headless scripts/greek2esc.py hooks/wolfram-license-notice.sh ;;
+    skill wolfram-headless scripts/greek2esc.py hooks/wolfram-license-notice.sh
+    mkdir -p .vscode
+    core starter/.vscode/settings.json .vscode/settings.json ;;  # notebook word wrap
 esac
 [ "$OVERLEAF" -eq 1 ] && skill overleaf-sync
 
@@ -160,7 +162,9 @@ say "  brew install rtk && rtk init -g --auto-patch    # token-saving output pro
 case $NUMERICS in mathematica|both)
     say "  code --install-extension wolfbook.wolfbook      # Mathematica notebooks in VS Code"
     say "  # then fix Wolfbook's comment-split bug (safe: idempotent, backs up, --revert):"
-    say "  curl -fsSL $REPO_RAW/scripts/patch-wolfbook-splitter.py | python3 -   # reload VS Code after" ;;
+    say "  curl -fsSL $REPO_RAW/scripts/patch-wolfbook-splitter.py | python3 -   # reload VS Code after"
+    say "  # add Mathematica-style section-folding keybindings (word wrap is already set above):"
+    say "  curl -fsSL $REPO_RAW/scripts/apply-notebook-ux.py | python3 -          # reload VS Code after" ;;
 esac
 say "  mkdir -p ~/.claude/skills/pdf && curl -o ~/.claude/skills/pdf/SKILL.md \\"
 say "    https://raw.githubusercontent.com/anthropics/skills/main/skills/pdf/SKILL.md"
