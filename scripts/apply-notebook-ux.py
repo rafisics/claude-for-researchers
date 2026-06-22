@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # apply-notebook-ux.py -- enable two notebook quality-of-life features in VS Code
-# (and forks): (1) word wrap inside notebook cells, and (2) Mathematica-style
-# keyboard folding of markdown sections. Works for Wolfbook .wb notebooks and any
-# other VS Code notebook.
+# (and forks): (1) word wrap inside notebook cells AND wrapping of long output
+# (including Wolfram results, rendered as plain text so they wrap instead of forcing a
+# sideways scroll), and (2) Mathematica-style keyboard folding of markdown sections.
+# Works for Wolfbook .wb notebooks and any other VS Code notebook.
 #
 # Usage (from anywhere):
 #   python3 apply-notebook-ux.py                 # word wrap -> ./.vscode/settings.json
@@ -20,7 +21,10 @@
 #     "[wolfram]": { "editor.wordWrap": "on" } inside notebook cells, and the plain
 #     unscoped "editor.wordWrap": "on" wraps EVERY file you open. The key that wraps
 #     notebook *cells only* (leaving your .tex/.py/etc. alone) is
-#     "notebook.editorOptionsCustomizations": { "editor.wordWrap": "on" }. This sets it.
+#     "notebook.editorOptionsCustomizations": { "editor.wordWrap": "on" }. This sets it,
+#     plus "notebook.output.wordWrap" for long output lines, plus -- for Wolfbook --
+#     "wolfbook.notebook.rendering.outputFormat": "InputForm" so results render as
+#     wrapping plain text rather than a fixed-width image that can only scroll sideways.
 #   * Folding: section folding is already built into VS Code notebooks -- a markdown
 #     heading cell (#, ##, ###, ####) folds every cell beneath it. There is no command
 #     to build; this only adds ergonomic keybindings (guarded so they fire only in a
@@ -42,10 +46,14 @@ import sys
 BACKUP_SUFFIX = ".cfr-ux.bak"
 
 # Word-wrap keys. notebook.editorOptionsCustomizations wraps notebook CELL editors only
-# (not regular files); notebook.output.wordWrap wraps long rendered output lines.
+# (not regular files); notebook.output.wordWrap wraps long rendered output lines; and
+# wolfbook.notebook.rendering.outputFormat=InputForm renders Wolfram results as wrapping
+# plain text instead of a fixed-width image that can only scroll sideways (Wolfbook-only
+# key -- harmless and ignored by Jupyter and other notebooks).
 WRAP_KEYS = {
     "notebook.editorOptionsCustomizations": {"editor.wordWrap": "on"},
     "notebook.output.wordWrap": True,
+    "wolfbook.notebook.rendering.outputFormat": "InputForm",
 }
 
 # Section-folding keybindings. Confined to a focused notebook with no cell in edit mode.
@@ -205,7 +213,10 @@ def merge_settings(path, dry):
                 '    // The unscoped "editor.wordWrap" wraps every file; a language-scoped\n'
                 '    // "[wolfram]" form does not reach cells -- this cell-scoped key is right.\n'
                 '    "notebook.editorOptionsCustomizations": { "editor.wordWrap": "on" },\n'
-                '    "notebook.output.wordWrap": true\n'
+                '    "notebook.output.wordWrap": true,\n'
+                '    // Wolfbook output as wrapping plain text, not a fixed-width image that can\n'
+                '    // only scroll sideways (Wolfbook-only key; ignored by other notebooks).\n'
+                '    "wolfbook.notebook.rendering.outputFormat": "InputForm"\n'
                 "}\n"
             )
     print("  + wrote word wrap to %s" % path)

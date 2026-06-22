@@ -1566,13 +1566,17 @@ explanation and the manual one-line edit. The `/nb-to-wolfbook` skill already av
 bug by putting each statement on one line; this patch is the belt-and-braces version.
 
 **Notebook word wrap and section folding.** Two VS Code quality-of-life fixes for `.wb` (or
-any) notebooks: long cell lines *wrap* instead of scrolling sideways, and you can *collapse a
-whole section* the way you double-click a section bracket in Mathematica. Both configure VS
-Code itself, not the Wolfbook extension, so they survive extension updates. The non-obvious
-part is word wrap: the key that wraps notebook *cell* editors **without** also wrapping your
-`.tex`/`.py`/`.md` files is `notebook.editorOptionsCustomizations` — the plain `editor.wordWrap`
-wraps every file, and the language-scoped `"[wolfram]"` form doesn't reach cells at all. Word
-wrap ships on by default in the starter's `.vscode/settings.json`; running
+any) notebooks: long cell lines — and long *output* — *wrap* instead of scrolling sideways, and
+you can *collapse a whole section* the way you double-click a section bracket in Mathematica.
+Both configure VS Code itself, not the Wolfbook extension, so they survive extension updates.
+The non-obvious part is word wrap: the key that wraps notebook *cell* editors **without** also
+wrapping your `.tex`/`.py`/`.md` files is `notebook.editorOptionsCustomizations` — the plain
+`editor.wordWrap` wraps every file, and the language-scoped `"[wolfram]"` form doesn't reach
+cells at all. Output has an extra wrinkle: `notebook.output.wordWrap` only wraps *text*
+results, but a Wolfram result renders by default as a fixed-width *image* that can only scroll
+sideways, so the starter also sets `wolfbook.notebook.rendering.outputFormat` to `InputForm`
+(wrapping plain text) — switch a notebook back to `Image` if you'd rather keep the typeset look
+there. Word wrap ships on by default in the starter's `.vscode/settings.json`; running
 `python3 scripts/apply-notebook-ux.py` also installs the section-folding keybindings
 (`Ctrl+Alt+[`/`]`, mac `⌥⌘[`/`]`) and is idempotent and `--revert`able. See
 [`docs/wolfbook-notebook-ux.md`](docs/wolfbook-notebook-ux.md) for the full why and a manual
@@ -2163,7 +2167,7 @@ in Part I.
 | [`starter/workbook.tex`](starter/workbook.tex) | LaTeX stub for the working record: preamble, theorem environments, skeleton sections — the research journal where proofs, derivations, and discussions live |
 | [`starter/brief.tex`](starter/brief.tex) | Condensed-reference stub with status tags (ESTABLISHED/CONJECTURED/OPEN) and cross-reference structure — fill in as results accumulate |
 | [`starter/.gitignore`](starter/.gitignore) | Ignore rules: Overleaf clone, LaTeX build artifacts, Python/Wolfram scratch, generated outputs (tracks `.vscode/settings.json`, ignores other VS Code state) |
-| [`starter/.vscode/settings.json`](starter/.vscode/settings.json) | Word wrap for notebook *cells only* (`notebook.editorOptionsCustomizations`), so `.tex`/`.py`/`.md` files are left alone (see `docs/wolfbook-notebook-ux.md`) |
+| [`starter/.vscode/settings.json`](starter/.vscode/settings.json) | Word wrap for notebook *cells only* (`notebook.editorOptionsCustomizations`), so `.tex`/`.py`/`.md` files are left alone, plus wrapping output (`notebook.output.wordWrap`) and Wolfram results as wrapping plain text instead of a scroll-only image (`wolfbook.notebook.rendering.outputFormat: InputForm`) (see `docs/wolfbook-notebook-ux.md`) |
 | [`starter/.claude/settings.json`](starter/.claude/settings.json) | Annotated generic settings: permissions that allow routine commands, ask before anything dangerous, and block nothing by default + hooks for pre-compact, dual-remote push, and promise-checker |
 | [`starter/.claude/hooks/pre-compact.sh`](starter/.claude/hooks/pre-compact.sh) | Pre-compact hook: timestamps CLAUDE.md and snapshots the task log before context compression |
 | [`starter/.claude/skills/latex-compile/SKILL.md`](starter/.claude/skills/latex-compile/SKILL.md) | Skill: compile LaTeX, fix every error and aesthetic issue (overfull boxes, fonts, widows), and gate on broken `\ref`/`\cite` so a dead reference (`??`/`[?]`) can't ship silently |
@@ -2181,7 +2185,7 @@ in Part I.
 | [`scripts/readme-latex-check.sh`](scripts/readme-latex-check.sh) | Scan a README for LaTeX commands that GitHub's MathJax does not support |
 | [`scripts/patch-wolfbook-splitter.py`](scripts/patch-wolfbook-splitter.py) | Patch Wolfbook's cell splitter so a `(* … *)` comment after an operator can't tear a statement in two (idempotent, backs up, `--revert`/`--dry-run`) |
 | [`docs/wolfbook-comment-split-fix.md`](docs/wolfbook-comment-split-fix.md) | Full explanation of the Wolfbook comment-split bug and the patch (with the manual one-line edit) |
-| [`scripts/apply-notebook-ux.py`](scripts/apply-notebook-ux.py) | Enable notebook word wrap + Mathematica-style section-folding keybindings across VS Code / Cursor / VSCodium / Windsurf (idempotent, backs up, `--revert`/`--dry-run`) |
+| [`scripts/apply-notebook-ux.py`](scripts/apply-notebook-ux.py) | Enable notebook word wrap (cells + output, incl. Wolfram results as wrapping text) + Mathematica-style section-folding keybindings across VS Code / Cursor / VSCodium / Windsurf (idempotent, backs up, `--revert`/`--dry-run`) |
 | [`docs/wolfbook-notebook-ux.md`](docs/wolfbook-notebook-ux.md) | Why notebook word wrap needs the cell-scoped `notebook.editorOptionsCustomizations` key, how built-in section folding works, and how to install both |
 
 ---

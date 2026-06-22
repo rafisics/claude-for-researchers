@@ -23,6 +23,21 @@ pack, not a linked library, so there is no API to break — the version answers
   this de-rectangling on an existing `.wb` with the smallest possible diff, and `--check` now
   also reports any rectangle-rendering PUA characters left in code cells. **Re-copy
   `starter/.claude/skills/nb-to-wolfbook/` to pick this up.**
+- **Wolfram output now wraps instead of forcing a sideways scroll.** `notebook.output.wordWrap`
+  (already shipped) only wraps *text* output; a Wolfram result renders by default as a single
+  fixed-width *image* that can only scroll horizontally, so wide results still ran off the right
+  edge. The starter settings and `scripts/apply-notebook-ux.py` now also set
+  `wolfbook.notebook.rendering.outputFormat` to `"InputForm"`, which renders results as wrapping
+  plain text that follows the notebook width and one theme colour. (Trade-off: linear text loses
+  the 2-D typeset layout — set a notebook back to `"Image"` if you prefer that there. The key is
+  Wolfbook-specific and harmless to non-Wolfbook notebooks.) See
+  [`docs/wolfbook-notebook-ux.md`](docs/wolfbook-notebook-ux.md).
+
+### Action needed if you set up a project before this release
+- **To get output wrapping, re-copy `starter/.vscode/settings.json`** (or add the one line
+  `"wolfbook.notebook.rendering.outputFormat": "InputForm"`), or re-run
+  `python3 scripts/apply-notebook-ux.py`. Optional — nothing breaks without it; wide Wolfram
+  output just keeps scrolling sideways until you do. Reload the VS Code window afterwards.
 
 ---
 

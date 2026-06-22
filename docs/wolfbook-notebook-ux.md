@@ -8,8 +8,8 @@ updates.
 
 It fixes two everyday annoyances:
 
-1. **Long lines scroll sideways** instead of wrapping. You drag the cell right just to read
-   the end of a line.
+1. **Long lines scroll sideways** instead of wrapping — both in the cell you are editing and
+   in the *output* below it. You drag the view right just to read the end of a line or a result.
 2. **No easy way to collapse a section.** In Mathematica you double-click a section bracket
    to fold a whole group away; in a VS Code notebook that affordance is easy to miss.
 
@@ -35,17 +35,40 @@ and the plain unscoped form works but wraps **every file you open** — your `.t
 "editor.wordWrap": "on"
 ```
 
-The right key applies editor options to notebook **cell editors only**:
+The right key applies editor options to notebook **cell editors only**, and two more keys make
+the *output* wrap as well:
 
 ```jsonc
-"notebook.editorOptionsCustomizations": { "editor.wordWrap": "on" },
-"notebook.output.wordWrap": true
+"notebook.editorOptionsCustomizations": { "editor.wordWrap": "on" }, // cell editors
+"notebook.output.wordWrap": true,                                    // text output lines
+"wolfbook.notebook.rendering.outputFormat": "InputForm"              // Wolfram results (see below)
 ```
 
-(`notebook.output.wordWrap` wraps long *output* lines too.) These ship on by default in the
-starter package's [`starter/.vscode/settings.json`](../starter/.vscode/settings.json), so a
-project set up from the starter wraps its notebook cells — and nothing else — with no extra
-step.
+These ship on by default in the starter package's
+[`starter/.vscode/settings.json`](../starter/.vscode/settings.json), so a project set up from
+the starter wraps its notebook cells *and* output — and nothing else — with no extra step.
+
+### The catch, part 2 — Wolfram output is an image, so word wrap can't touch it
+
+`notebook.output.wordWrap` only wraps output that is **text**. By default Wolfbook renders an
+evaluated result as a single fixed-width **image** (`wolfbook.notebook.rendering.outputFormat`
+defaults to `"Image"`), and an image can only ever scroll sideways — word wrap has nothing to
+reflow, so a wide result still runs off the right edge. Setting the format to `"InputForm"`
+makes Wolfbook emit the result as plain text (`white-space: pre-wrap`), which wraps to the
+notebook width and uses a single colour that reads cleanly on any theme:
+
+```jsonc
+"wolfbook.notebook.rendering.outputFormat": "InputForm"
+```
+
+The other choices are `"HTML"` (wraps, but carries Wolfram-Cloud styling that can clash with a
+light theme), `"MathML"`, and the default `"Image"`. This key is Wolfbook-specific — Jupyter
+and other notebooks simply ignore it, so it is harmless to set everywhere.
+
+**Trade-off (be honest with yourself):** `InputForm` is linear text, so a large matrix or a
+heavily typeset expression loses the 2-D layout you get from the image. If you prefer the
+typeset look in a particular notebook, set that one back to `"Image"` — you keep wrapping
+everywhere else.
 
 ### Where to put it
 
