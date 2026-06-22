@@ -11,6 +11,17 @@ pack, not a linked library, so there is no API to break — the version answers
 
 ## v2026.06 — 2026-06-22 (update)
 
+### Added
+- **Guide: "Group projects — shared vs personal configuration."** A new README section for
+  teams sharing one repo: which Claude Code config to **commit** (`CLAUDE.md`,
+  `.claude/settings.json`, `.claude/skills/`, `.claude/hooks/`, `.mcp.json`) and which to keep
+  **personal** (`.claude/settings.local.json`, `CLAUDE.local.md`, and everything under
+  `~/.claude/`). Covers settings/memory precedence, the fact that a committed hook runs on every
+  collaborator's machine (keep them portable; ship setup-dependent ones off), and not putting
+  secrets or personal paths in shared files. The starter `.gitignore` now ignores
+  `.claude/settings.local.json` and `CLAUDE.local.md` so personal config can't be committed by
+  accident.
+
 ### Changed
 - **`nb-to-wolfbook` now de-rectangles private-font operators (PUA → ASCII).** Mathematica
   stores `==`, `->`, `:>` and the constants `I`, `E` as characters in the Unicode Private Use
@@ -33,11 +44,23 @@ pack, not a linked library, so there is no API to break — the version answers
   Wolfbook-specific and harmless to non-Wolfbook notebooks.) See
   [`docs/wolfbook-notebook-ux.md`](docs/wolfbook-notebook-ux.md).
 
+### Clarified
+- **"Global skills" guide section corrected and expanded.** Its examples used the flat
+  `latex-compile.md` form, which contradicts the folder rule the guide states earlier — a global
+  skill is `~/.claude/skills/<name>/SKILL.md`, same as a project skill, or it silently fails to
+  register. Fixed those (and the `/pdf` install example), and added the gotcha for skills that
+  ship helper scripts (rewrite the in-`SKILL.md` path to `~/.claude/skills/...` for a global
+  copy) plus which toolkit skills make good global candidates (the structure-agnostic tools) vs
+  which stay project-local (`sync-brief`, `overleaf-sync`).
+
 ### Action needed if you set up a project before this release
 - **To get output wrapping, re-copy `starter/.vscode/settings.json`** (or add the one line
   `"wolfbook.notebook.rendering.outputFormat": "InputForm"`), or re-run
   `python3 scripts/apply-notebook-ux.py`. Optional — nothing breaks without it; wide Wolfram
   output just keeps scrolling sideways until you do. Reload the VS Code window afterwards.
+- **Re-copy `starter/.gitignore`** (or add the two lines `.claude/settings.local.json` and
+  `CLAUDE.local.md`) so your personal Claude Code config stays out of a shared repo. Optional and
+  harmless if you work solo.
 
 ---
 

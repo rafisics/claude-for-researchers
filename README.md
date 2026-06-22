@@ -62,16 +62,17 @@ This guide serves two audiences at once, so it is organised in parts:
 **[Part III: Power tools](#part-iii-power-tools)** — *optional; adopt once the basics feel comfortable*
 
 12. [Settings and hooks](#settings-and-hooks)
-13. [Reducing token consumption: rtk](#reducing-token-consumption-rtk)
-14. [GitHub README and LaTeX](#github-readme-and-latex)
+13. [Group projects: shared vs personal configuration](#group-projects-shared-vs-personal-configuration)
+14. [Reducing token consumption: rtk](#reducing-token-consumption-rtk)
+15. [GitHub README and LaTeX](#github-readme-and-latex)
 
 **[Part IV: What Claude gets wrong](#part-iv-what-claude-gets-wrong)** — *required reading*
 
-15. [Honest limitations](#honest-limitations)
+16. [Honest limitations](#honest-limitations)
 
 **[Appendix](#appendix)**
 
-16. [Templates and scripts in this repo](#templates-and-scripts-in-this-repo)
+17. [Templates and scripts in this repo](#templates-and-scripts-in-this-repo)
 
 ---
 
@@ -1282,13 +1283,13 @@ tasks. The most useful one for researchers is the **pdf skill**.
 
 **The pdf skill** handles everything you might want to do with a PDF file: extract
 text or tables, merge or split documents, add watermarks, OCR a scanned PDF, or
-create a new PDF programmatically. Drop the skill file into `.claude/skills/` and
-invoke it with `/pdf` (or whatever name you give the file).
+create a new PDF programmatically. Drop it into `.claude/skills/pdf/SKILL.md` (the
+named-folder layout skills require) and invoke it with `/pdf`.
 
 Install it:
 ```bash
-# Download directly:
-curl -o .claude/skills/pdf.md \
+# Download into the required <name>/SKILL.md folder layout:
+mkdir -p .claude/skills/pdf && curl -o .claude/skills/pdf/SKILL.md \
   https://raw.githubusercontent.com/anthropics/skills/main/skills/pdf/SKILL.md
 ```
 
@@ -1304,28 +1305,42 @@ have a skill you use everywhere — like `/latex-compile` or `/pdf` — you woul
 otherwise have to copy the file into every new project by hand.
 
 There is a better way: put the skill in `~/.claude/skills/`. Claude Code loads
-that directory on startup regardless of which project you are in. A skill placed
-there is immediately available in every project, with no setup.
+that directory on startup regardless of which project you are in, so a skill placed
+there is immediately available in every project, with no setup. **The same folder
+rule applies** — a global skill is `~/.claude/skills/<name>/SKILL.md`, not a loose
+`.md` file:
 
 ```bash
-# Copy an existing project skill to global:
-cp .claude/skills/latex-compile.md ~/.claude/skills/
+# Copy an existing project skill — folder and all — to global:
+cp -R .claude/skills/latex-compile ~/.claude/skills/
 
-# Or write a new global skill directly:
-# create ~/.claude/skills/my-skill.md
+# Or start a new global skill directly:
+mkdir -p ~/.claude/skills/my-skill    # then create ~/.claude/skills/my-skill/SKILL.md
 ```
 
-The skill works exactly the same way — you invoke it with `/latex-compile` as
-usual, Claude reads the file from `~/.claude/skills/`, and it executes. The only
-difference is where the file lives.
+You invoke it with `/latex-compile` as usual; the only difference is where the
+folder lives. If a project has its own `.claude/skills/<name>/` with the same name,
+that project copy wins — a convenient way to override a global skill in one project.
+
+**One gotcha for skills that ship companion scripts.** If the `SKILL.md` tells
+Claude to run a helper by path — e.g. `python3 .claude/skills/foo/foo.py` — that
+path is relative to the *project root* and will not resolve for a global skill. In
+the global copy, point it at the absolute location instead
+(`python3 ~/.claude/skills/foo/foo.py`) so it runs from any project. (This toolkit's
+global `sync-wb-nb`, `wolfram-headless`, and `nb-to-wolfbook` are adapted exactly
+this way.)
 
 **When to make a skill global vs project-local:**
 
-- **Global** — the skill is generic and project-independent (compiling LaTeX,
-  processing PDFs, formatting citations). You want it everywhere.
-- **Project-local** — the skill references project-specific paths, macros, or
-  conventions (e.g., `/sync-brief` that knows about your specific `workbook.tex`
-  and `brief.tex` structure). Keep it in the project.
+- **Global** — the skill is a generic, structure-agnostic *tool*: it acts on
+  whatever file you point it at and assumes nothing about your project's layout.
+  Good candidates from this toolkit are `latex-compile`, `pdf`, `wolfram-headless`,
+  `wolfbook`, `sync-wb-nb`, `nb-to-wolfbook`, `verify-citation`, `reality-check`,
+  and `cross-validate`. You want these everywhere.
+- **Project-local** — the skill bakes in a specific layout, macro set, or remote.
+  `sync-brief` knows your `workbook.tex`/`brief.tex` split, and `overleaf-sync`
+  assumes an Overleaf git clone — keep these in the project (and delete the ones a
+  given project does not use).
 
 If a skill starts life as project-local and you later find yourself copying it
 into every new project, that is the signal to move it to `~/.claude/skills/`.
@@ -1832,6 +1847,75 @@ debugging a push that went wrong.
 
 See [`starter/.claude/settings.json`](starter/.claude/settings.json) and
 [`starter/.claude/hooks/pre-compact.sh`](starter/.claude/hooks/pre-compact.sh) for working, annotated examples.
+
+---
+
+## Group projects: shared vs personal configuration
+
+Everything so far has assumed one person and one repository. When several people
+share a project, one question decides whether Claude Code helps the whole team or
+just you: which configuration do you **commit** (so every collaborator gets it), and
+which stays **personal** (so it never lands in someone else's checkout)? Claude Code
+is built for exactly this split — you only need to know which file is which.
+
+**Commit these — they are shared project context:**
+
+- **`CLAUDE.md`** — the project's goal, file layout, conventions, and citation rules.
+  This is the single biggest reason a teammate's session is productive from the first
+  message instead of the tenth. Commit it, and treat edits to it like edits to a
+  shared interface.
+- **`.claude/settings.json`** — shared permissions and hooks, so everyone gets the
+  same guardrails (the allow/ask lists) and the same automation.
+- **`.claude/skills/`** — project skills. A skill that encodes "how we compile this
+  paper" or "how we sync the notebook" should be identical for everyone.
+- **`.claude/hooks/`** — the scripts your shared hooks call.
+- **`.mcp.json`**, if you use MCP servers — the server *configuration* is shared;
+  each person supplies their own auth tokens locally.
+
+**Keep these personal — never commit them:**
+
+- **`.claude/settings.local.json`** — your personal, per-project overrides (an extra
+  permission only you want, a personal environment variable). It takes precedence over
+  the shared `.claude/settings.json`, so you can tweak things for yourself without
+  touching the team's file. **Add it to `.gitignore`** — Claude Code does not reliably
+  do this for you (the starter `.gitignore` now lists it).
+- **`CLAUDE.local.md`** — personal, project-specific notes ("my venv lives here",
+  "remind me where I left off") the rest of the team does not need. Gitignore it too.
+- **`~/.claude/CLAUDE.md` and `~/.claude/settings.json`** — your *global* preferences
+  and settings, applied in every project you open. They live in your home directory,
+  never in any repo, so they are personal by construction. Your personal global skills
+  go in `~/.claude/skills/` the same way (see
+  [Global skills](#global-skills-one-skill-every-project)).
+
+**How the layers combine.** For settings, precedence runs (highest first):
+managed/enterprise policy → command-line flags → `.claude/settings.local.json` (your
+personal project file) → `.claude/settings.json` (shared) → `~/.claude/settings.json`
+(your global). One subtlety: the permission `allow`/`ask`/`deny` lists *merge* across
+these layers rather than replacing one another — so your personal file can **add** a
+permission but cannot remove one the shared file grants. For memory,
+`~/.claude/CLAUDE.md` loads first, then the shared `./CLAUDE.md`, then your
+`./CLAUDE.local.md`, each refining the last. A committed `CLAUDE.md` can even pull in a
+personal file with an import line (`@~/.claude/my-notes.md`), keeping the personal part
+out of the repo entirely.
+
+**Two cautions specific to teams:**
+
+- **A committed hook runs on everyone's machine.** A hook in `.claude/settings.json`
+  executes for every collaborator (after they grant the one-time workspace-trust
+  prompt the first time they open the repo). Keep shared hooks portable — reference
+  scripts by a repo-relative path or `${CLAUDE_PROJECT_DIR}/.claude/hooks/...`, never a
+  personal absolute path like `/Users/you/...` — and ship anything that depends on
+  *your* setup turned **off**. This is exactly why the starter's git-mirror hook ships
+  disabled: it targets a second remote and identity only you have, so forcing it on the
+  team would fail silently on their machines. Per-person things — your dual-remote
+  identity, your local paths — belong in `settings.local.json` or `~/.claude/`, not in
+  a shared file.
+- **No secrets or personal identifiers in shared files.** API keys, tokens, personal
+  emails, and absolute home paths do not belong in `CLAUDE.md`,
+  `.claude/settings.json`, or `.mcp.json`. Put them in the personal/local files above.
+
+Rule of thumb: **shared = anything that should be true for the project no matter who
+is working on it; personal = anything true only about you or your machine.**
 
 ---
 

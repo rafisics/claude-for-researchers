@@ -37,3 +37,10 @@ numerics/img/
 # with this toolkit (notebook cells; see docs/wolfbook-notebook-ux.md).
 .vscode/*
 !.vscode/settings.json
+
+# --- Claude Code: personal config (keep the SHARED .claude/ and CLAUDE.md tracked) ---
+# These are per-user overrides — never commit them to a shared project. The shared
+# .claude/settings.json, .claude/skills/, .claude/hooks/, and CLAUDE.md stay tracked.
+# See the "Group projects" section of the README.
+.claude/settings.local.json
+CLAUDE.local.md
