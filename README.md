@@ -1546,8 +1546,13 @@ the skill converts that. Either way it makes every cell **bridge-safe** — putt
 each statement on a single line — which matters because the tool that runs cells
 from VS Code splits them on line breaks, and a statement wrapped across several
 lines would otherwise be silently mis-evaluated (a dropped factor, a definition
-turned into a product) without any error. Output cells are not preserved — re-run
-them after opening the `.wb`. Convert once, then work in `.wb` going forward.
+turned into a product) without any error. It also rewrites the operators Mathematica
+stores as private-font glyphs (`==`, `->`, `:>`, and the constants `I`, `E`) to plain
+ASCII, so they stop showing up as **empty rectangles** in VS Code's editor font — a
+display-only annoyance the kernel never noticed, but a confusing one to read
+(`/nb-to-wolfbook --puafix <file>` does just this de-rectangling on an existing `.wb`,
+with no other changes). Output cells are not preserved — re-run them after opening the
+`.wb`. Convert once, then work in `.wb` going forward.
 
 **Optional: patch the splitter at the root.** The line-splitting above has a sharp
 edge — a `(* ... *)` comment placed right after an operator (e.g. `x :=(*note*)` with
@@ -2163,7 +2168,7 @@ in Part I.
 | [`starter/.claude/hooks/pre-compact.sh`](starter/.claude/hooks/pre-compact.sh) | Pre-compact hook: timestamps CLAUDE.md and snapshots the task log before context compression |
 | [`starter/.claude/skills/latex-compile/SKILL.md`](starter/.claude/skills/latex-compile/SKILL.md) | Skill: compile LaTeX, fix every error and aesthetic issue (overfull boxes, fonts, widows), and gate on broken `\ref`/`\cite` so a dead reference (`??`/`[?]`) can't ship silently |
 | [`starter/.claude/skills/sync-brief/SKILL.md`](starter/.claude/skills/sync-brief/SKILL.md) | Skill: propagate load-bearing changes from workbook.tex to brief.tex |
-| [`starter/.claude/skills/nb-to-wolfbook/SKILL.md`](starter/.claude/skills/nb-to-wolfbook/SKILL.md) | Skill: convert .nb notebooks and .m scripts to Wolfbook's .wb format, made bridge-safe (each statement on one line, so the MCP evaluates them faithfully). Ships helper scripts `nb2wb.py`, `nb2wb_extract.wls`, `wl_normalize.py` |
+| [`starter/.claude/skills/nb-to-wolfbook/SKILL.md`](starter/.claude/skills/nb-to-wolfbook/SKILL.md) | Skill: convert .nb notebooks and .m scripts to Wolfbook's .wb format, made bridge-safe (each statement on one line, so the MCP evaluates them faithfully) and de-rectangled (private-font operators `==`/`->`/`:>`/`I`/`E` → ASCII so they don't render as empty boxes in VS Code). Ships helper scripts `nb2wb.py`, `nb2wb_extract.wls`, `wl_normalize.py` (`--puafix`/`--check` CLIs) |
 | [`starter/.claude/skills/sync-wb-nb/SKILL.md`](starter/.claude/skills/sync-wb-nb/SKILL.md) | Skill: propagate .wb edits into the paired .nb, keeping it in sync for Mathematica collaborators |
 | [`starter/.claude/skills/wolfram-headless/SKILL.md`](starter/.claude/skills/wolfram-headless/SKILL.md) | Skill: run heavy headless `wolframscript` reliably — why "license error" usually means a memory crash, and why literal Greek in `.wls` silently corrupts symbols. Ships `scripts/greek2esc.py` and an opt-in `hooks/wolfram-license-notice.sh` |
 | [`starter/.claude/skills/verify-citation/SKILL.md`](starter/.claude/skills/verify-citation/SKILL.md) | Skill: verify a paper exists on Semantic Scholar / arXiv before writing it as a citation |

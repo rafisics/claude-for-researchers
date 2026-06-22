@@ -11,8 +11,9 @@ identically through the Wolfbook MCP (`runCell` / `evaluateExpression`) as they 
 in the Mathematica front end.
 
 ## When to invoke
-`/nb-to-wolfbook <file-or-directory>`  — convert .nb/.m to .wb.
-`/nb-to-wolfbook --fix-wb <file.wb>`   — normalize an EXISTING .wb in place (bridge-safe), backup written.
+`/nb-to-wolfbook <file-or-directory>`  — convert .nb/.m to .wb (bridge-safe + PUA→ASCII).
+`/nb-to-wolfbook --fix-wb <file.wb>`   — normalize an EXISTING .wb in place (bridge-safe + PUA→ASCII), backup written.
+`/nb-to-wolfbook --puafix <file.wb>`   — de-rectangle ONLY (PUA→ASCII, no newline reflow): the smallest diff that removes the rectangle glyphs from an already-bridge-safe .wb.
 
 ## ⚠️ The bug this skill exists to prevent (READ THIS)
 
@@ -57,14 +58,42 @@ genuine statement breaks export at column 0, so they are still kept. Backstop:
 `find_split_hazards` (CLI `--check`) flags any definition whose RHS is split across a
 top-level newline.
 
+## ⚠️ The OTHER bug: PUA operators render as empty rectangles
+
+Mathematica stores `==`, `->`, `:>` (and the constants `I`, `E`) as characters in the
+Unicode **Private Use Area** (`\[Equal]`=U+F431, `\[Rule]`=U+F522, `\[RuleDelayed]`=U+F51F,
+`\[ImaginaryI]`=U+F74E, `\[ExponentialE]`=U+F74D, `\[LongEqual]`=U+F7D9). The kernel parses
+them IDENTICALLY to the ASCII forms, and Mathematica's own fonts have glyphs for them — but
+the front-end `"InputText"` export keeps the literal PUA chars, so the `.wb` carries them too.
+A code font without the Wolfram PUA (VS Code's default, most monospace fonts) then draws each
+as an **empty rectangle (tofu)** — e.g. a cell's `If[w == 1, If[k == 2, …]]` showed as
+`If[w ▯ 1, If[k ▯ 2, …]]`. Nothing is broken; it is purely a display problem, but a confusing one.
+
+The fix (in `wl_normalize.pua_to_ascii`, called first inside `normalize`): replace each PUA
+operator/constant with its ASCII equivalent (`\[Equal]`→`==`, `\[Rule]`→`->`, `\[RuleDelayed]`→`:>`,
+`\[LongEqual]`→`==`, `\[ImaginaryI]`→`I`, `\[ExponentialE]`→`E`). Kernel-identical, displays in
+any font. **String-aware:** PUA inside `"..."` string literals is left untouched (that is data,
+not code); PUA inside `(* comments *)` IS converted (display text, safe). **Word-boundary-safe:**
+the letter constants `I`/`E` get spaces inserted only when an adjacent alphanumeric would otherwise
+glue them into a different symbol (`2\[ImaginaryI]`→`2 I`, never `2I`-as-something-else).
+Standard-Unicode operators that are NOT PUA (`\[And]`∧, `\[Or]`∨, `\[LessEqual]`≤, `\[Element]`∈,
+Greek letters ω/α/…) render fine and are deliberately left alone — converting them would be scope
+creep. Any PUA char with no ASCII mapping is reported (still a rectangle; decide by hand).
+
+⚠️ **Editing a `.wb` that is OPEN in VS Code:** the live editor buffer overwrites on-disk edits,
+so a disk-level fix gets silently clobbered when the buffer next saves. Close the notebook tab (or
+edit via the Wolfbook MCP), THEN run the fix, THEN reopen.
+
 ## Helper scripts (committed alongside this skill)
 
-- `wl_normalize.py` — the normalizer. `normalize(code)` collapses intra-statement
-  newlines (incl. FE soft-wraps via the continuation-indent signal); string/comment/
-  bracket-aware. CLIs: `python3 wl_normalize.py --wb <file.wb>` rewrites every wolfram
-  code cell in place (writes `<file>.wb.bak` first; warns on residual hazards);
-  `python3 wl_normalize.py --check <file.wb>` reports split-statement hazards (exit 1 if
-  any). Or pipe: `... | python3 wl_normalize.py`.
+- `wl_normalize.py` — the normalizer. `normalize(code)` first runs `pua_to_ascii` (PUA
+  operators → ASCII; see the rectangle bug above) then collapses intra-statement newlines
+  (incl. FE soft-wraps via the continuation-indent signal); string/comment/bracket-aware.
+  CLIs: `python3 wl_normalize.py --wb <file.wb>` rewrites every wolfram code cell in place
+  (newline reflow + PUA→ASCII; writes `<file>.wb.bak`; warns on residual hazards/PUA);
+  `python3 wl_normalize.py --puafix <file.wb>` does PUA→ASCII only (no reflow, minimal diff);
+  `python3 wl_normalize.py --check <file.wb>` reports split-statement hazards AND any
+  rectangle-rendering PUA chars (exit 1 if any). Or pipe: `... | python3 wl_normalize.py`.
 - `nb2wb_extract.wls` — wolframscript extractor: reads a `.nb` and emits every cell in
   order as **faithful InputText** via the front end (`FrontEnd`ExportPacket[..., "InputText"]`),
   preserving comments and special characters. Avoids the old lossy "Package export + split
@@ -104,11 +133,12 @@ Normalizes every code cell in place (backup `.wb.bak`). Use this when a `.wb` al
 exists but mis-evaluates through the bridge.
 
 ## Verify after conversion
-Run the hazard checker (catches the `)`-suffix / implicit-`Times` split that a naive
-operator-suffix test misses — that gap caused the MMVbar regression):
+Run the checker (catches the `)`-suffix / implicit-`Times` split that a naive operator-suffix
+test misses — the MMVbar regression — AND reports any rectangle-rendering PUA chars left in
+code cells):
 ```bash
 python3 .claude/skills/nb-to-wolfbook/wl_normalize.py --check "<file.wb>"
-# expect: "OK: no split-statement hazards in <file.wb>"  (exit 0)
+# expect: "OK: no split-statement hazards ..." and "OK: no PUA (rectangle) chars ..."  (exit 0)
 ```
 The driver also prints any hazard inline. Output format:
 `Converted: <src> -> <dst> (N code cells, M markdown cells, bridge-safe).`

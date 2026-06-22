@@ -9,6 +9,23 @@ Versioning is calendar-based (`vYYYY.MM`): this is a guide and a copy-in starter
 pack, not a linked library, so there is no API to break — the version answers
 "how current is my copy?", nothing more.
 
+## v2026.06 — 2026-06-22 (update)
+
+### Changed
+- **`nb-to-wolfbook` now de-rectangles private-font operators (PUA → ASCII).** Mathematica
+  stores `==`, `->`, `:>` and the constants `I`, `E` as characters in the Unicode Private Use
+  Area. The kernel parses them exactly like the ASCII forms and Mathematica's own font draws
+  them correctly, but a code font without those glyphs (VS Code's default, most monospace
+  fonts) renders each as an **empty rectangle** — so a cell like `If[w == 1, …]` showed up as
+  `If[w ▯ 1, …]`. Nothing was broken, but it was confusing to read. Conversion and `--fix-wb`
+  now normalize these to ASCII automatically (string-literal-aware — text inside `"..."` is
+  left alone — and word-boundary-safe for the letter constants). New `--puafix` CLI does only
+  this de-rectangling on an existing `.wb` with the smallest possible diff, and `--check` now
+  also reports any rectangle-rendering PUA characters left in code cells. **Re-copy
+  `starter/.claude/skills/nb-to-wolfbook/` to pick this up.**
+
+---
+
 ## v2026.06 — 2026-06-20 (update)
 
 ### Added
